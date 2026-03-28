@@ -1,72 +1,272 @@
 ---
-description: React Native frontend conventions for MealMate
+description: >
+  @frontend role — Senior React Native Engineer for MealMate.
+  Activate with @frontend prefix. Covers component architecture,
+  state boundaries, async UX, accessibility, security, Mapbox (@rnmapbox/maps),
+  and performance for the Expo / React Native / TypeScript / Zustand / React Query stack.
 globs: frontend/**/*.{ts,tsx}
 alwaysApply: false
 ---
 
-# Frontend Conventions (React Native + TypeScript)
+# @frontend — Senior React Native Engineer (MealMate)
+
+**Activate:** Prefix your message with `@frontend`  
+**Stack:** React Native (Expo SDK 52) · TypeScript · Zustand · React Query · @rnmapbox/maps · Axios · expo-status-bar
+
+---
+
+## Mandatory: UI/UX Pre-Flight
+
+Before ANY UI change (layout, component, color, animation) read the project's UI UX skill:
+
+```
+d:\MealMate\.cursor\skills\ui-ux-pro-max\SKILL.md
+```
+
+Key design tokens live in `frontend/src/utils/colors.ts`.  
+**Never hardcode a hex that already exists in `Colors`.**
+
+---
+
+## Directory Structure (Feature-First)
+
+```
+frontend/src/
+├── components/          # Shared, stateless, reusable UI atoms
+│   └── *.tsx            # AppHeader, BottomNavBar, RecipeCard …
+├── screens/             # Full-page compositions (one per route)
+│   └── *Screen.tsx
+├── hooks/               # Logic only — no JSX
+│   └── use*.ts
+├── services/            # HTTP calls only — no state, no JSX
+│   └── *Service.ts
+├── store/               # Zustand slices — client state only
+│   └── use*Store.ts
+├── types/               # TypeScript interfaces & Zod schemas
+│   └── *.ts
+└── utils/               # Pure functions, constants, Colors
+    └── colors.ts
+```
+
+**MVP rule:** `components/` and `screens/` are enough to ship. Add `hooks/`, `services/`, `store/` only when logic gets reused or files exceed 200 lines.
+
+---
 
 ## Component Rules
 
-- Use **functional components only** — no class components
-- All components must be typed with TypeScript (`React.FC` or explicit props interface)
-- File name matches component name: `IngredientCard.tsx` exports `IngredientCard`
-
 ```tsx
-// ✅ GOOD
-interface IngredientCardProps {
-  name: string;
-  quantity: number;
-  inStock: boolean;
+// ✅ Named export + explicit props interface
+interface RecipeCardProps {
+  recipe: Recipe;
+  onPress?: () => void;
 }
 
-export const IngredientCard: React.FC<IngredientCardProps> = ({ name, quantity, inStock }) => {
-  return <View>...</View>;
-};
+export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onPress }) => (
+  <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+    ...
+  </TouchableOpacity>
+);
 
-// ❌ BAD — anonymous default export, no types
-export default ({ name }) => <View />;
+// ❌ Anonymous default export — untraceable in stack traces
+export default ({ recipe }) => <View />;
 ```
+
+- **Functional components only** — no class components
+- File name **matches** export name exactly: `RecipeCard.tsx` → `RecipeCard`
+- Max **200 lines** per file — split into sub-components if exceeded
+- Props interfaces defined **above** the component, not inline
+
+---
 
 ## Naming Conventions
 
-| Type            | Convention   | Example              |
-| --------------- | ------------ | -------------------- |
-| Component file  | PascalCase   | `IngredientCard.tsx` |
-| Screen file     | PascalCase   | `RecipeScreen.tsx`   |
-| Hook file       | camelCase    | `useIngredients.ts`  |
-| Utility file    | camelCase    | `formatDistance.ts`  |
+| Type | Convention | Example |
+|---|---|---|
+| Component | PascalCase | `StoreCard.tsx` |
+| Screen | PascalCase + `Screen` | `MarketMapScreen.tsx` |
+| Hook | camelCase + `use` prefix | `useNearbyStores.ts` |
+| Service | camelCase + `Service` | `krogerService.ts` |
+| Zustand store | camelCase + `Store` | `useCartStore.ts` |
+| Type/Interface | PascalCase | `Store`, `IngredientItem` |
+| Constant | UPPER_SNAKE | `MAX_STORE_RADIUS_MILES` |
 
-## Hooks
+---
 
-- Extract reusable state logic into `src/hooks/`
-- Hook names always start with `use`
+## State Management (MVP — pragmatic)
+
+> **MVP mode:** Move fast. Strict boundaries enforced post-MVP.
+
+| State Type | Solution |
+|---|---|
+| Local UI state | `useState` — default choice |
+| Shared / cross-screen state | Zustand slice (ok to store fetched data here for now) |
+| Navigation | React Navigation params |
+| Form | `useState` or React Hook Form |
 
 ```ts
-// src/hooks/useIngredients.ts
-export function useIngredients(recipeId: string) {
-  // fetch, filter, return state
-}
+// ✅ MVP: useState for simple fetches
+const [stores, setStores] = useState<Store[]>([]);
+useEffect(() => { fetchStores().then(setStores); }, []);
+
+// ✅ MVP: Zustand is fine for shared fetched data too
+useStoreSlice.setState({ stores });
+
+// 🔜 Post-MVP: migrate server state to React Query
 ```
 
-## API Calls
+---
 
-- **Never call APIs directly from a component or hook**
-- All HTTP requests go through `src/services/`
+## Async UX Pattern (Fire & Listen)
 
-```ts
-// ✅ GOOD — src/services/recipeService.ts
-export async function fetchIngredients(recipeId: string) {
-  const { data } = await apiClient.get(`/recipes/${recipeId}/ingredients`);
-  return data;
-}
+For any operation >300ms (API call, AI analysis, route computation):
 
-// ❌ BAD — axios call inside a component
-const res = await axios.get('/recipes/...');
+1. **Fire** — trigger API → receive `jobId` or await promise
+2. **Feedback** — immediately show skeleton or `ActivityIndicator`
+3. **Listen** — if polling: exponential backoff (1s → 2s → 4s → 8s → 15s max)
+4. **Resolve** — update UI; on error: show inline error + retry button
+
+```tsx
+// ✅ Always show loading state
+const { data, isLoading, isError } = useQuery({ ... });
+
+if (isLoading) return <SkeletonCard />;
+if (isError)   return <ErrorBanner onRetry={refetch} />;
+return <RecipeCard data={data} />;
+
+// ❌ Silent loading — user sees nothing
+const [data, setData] = useState(null);
+useEffect(() => { fetchData().then(setData); }, []);
+return data ? <RecipeCard data={data} /> : null;
 ```
 
-## State Management
+---
 
-- Use **Zustand** for global state (`src/store/`)
-- Use `@tanstack/react-query` for server state (fetching, caching)
-- Local component state stays in `useState`
+## Styling Rules
+
+```tsx
+// ✅ StyleSheet.create — all styles at the bottom of file
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: 16,
+    padding: 16,
+  },
+});
+
+// ❌ Inline object styles — creates new object on every render
+<View style={{ backgroundColor: '#fff', padding: 16 }} />
+```
+
+- **All colors** from `Colors` (`utils/colors.ts`) — never hardcode hex
+- **No magic numbers** — extract to named constant if used >1 time
+- **Shadows:** always set both `shadowColor/shadowOffset/shadowOpacity/shadowRadius` (iOS) **and** `elevation` (Android)
+- **Absolute positioning** always requires `zIndex` documented with a comment
+
+---
+
+## Security (MVP minimum)
+
+- API keys in `.env` only — never hardcoded in source
+- No `console.log` with passwords or real user tokens
+- Zod validation and SecureStore → **post-MVP hardening**
+
+---
+
+## @rnmapbox/maps Hygiene
+
+```tsx
+// ✅ Initialize token ONCE at app startup (App.tsx)
+import MapboxGL from '@rnmapbox/maps';
+MapboxGL.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN!);
+
+// ✅ Lazy-load map screens — heavy WebGL context
+const MarketMapScreen = React.lazy(() => import('./screens/MarketMapScreen'));
+
+// ✅ Cap markers — cluster beyond 50 pins
+import Supercluster from 'supercluster';
+// render clusters, not raw markers
+
+// ✅ Traffic-aware routing via Directions API
+const route = await mapboxDirections.getRoute({
+  profile: 'driving-traffic',
+  waypoints: [origin, ...stops],
+});
+
+// ❌ Never leave map mounted after navigation
+useEffect(() => {
+  return () => map.current?.remove(); // cleanup WebGL context
+}, []);
+```
+
+- Map view must show a **loading placeholder** while tiles load
+- `Camera` component handles viewport — never manipulate `flyTo` without user intent
+- Store marker click → update carousel selection, do NOT trigger re-render of entire map
+
+---
+
+## Accessibility (React Native)
+
+```tsx
+// ✅ TouchableOpacity with accessibilityLabel
+<TouchableOpacity
+  accessibilityLabel="Add salmon to cart"
+  accessibilityRole="button"
+  onPress={handleAdd}
+>
+  <MaterialIcons name="add_shopping_cart" />
+</TouchableOpacity>
+
+// ❌ View with onPress — not reachable via screen readers
+<View onPress={handleAdd}>
+  <MaterialIcons name="add_shopping_cart" />
+</View>
+```
+
+- **Always** use `TouchableOpacity` / `Pressable` — never `View` with `onPress`
+- Icon-only buttons **must** have `accessibilityLabel`
+- Destructive actions (delete, clear cart) **must** show a confirmation dialog
+- Minimum touch target: **44×44pt**
+- Text contrast minimum **4.5:1** against its background — check `Colors` pairs
+- Test at common screen widths: **375px** (iPhone SE), **390px** (iPhone 14), **412px** (Pixel 7)
+
+---
+
+## Performance Rules
+
+```tsx
+// ✅ FlatList for long lists — virtualized
+<FlatList
+  data={stores}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => <StoreCard store={item} />}
+  getItemLayout={(_, index) => ({ length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index })}
+/>
+
+// ❌ .map() inside ScrollView for long lists — renders ALL at once
+<ScrollView>
+  {stores.map(store => <StoreCard key={store.id} store={store} />)}
+</ScrollView>
+
+// ✅ Memoize expensive components
+export const StoreCard = React.memo(({ store }: StoreCardProps) => { ... });
+
+// ✅ useCallback for handlers passed as props
+const handleSelect = useCallback(() => onSelect(store.id), [store.id, onSelect]);
+```
+
+- Use `FlatList` / `SectionList` when list length is unknown or >20 items
+- `React.memo` for components that receive the same props frequently
+- Images: always specify `width` + `height` to avoid layout thrash
+
+---
+
+## MVP Checklist (ship fast)
+
+- [ ] `npx expo start` compiles with zero TypeScript errors
+- [ ] Async operations show a loading indicator (even a simple `ActivityIndicator`)
+- [ ] All interactive elements use `TouchableOpacity` / `Pressable`
+- [ ] Colors sourced from `Colors` — no hardcoded hex
+- [ ] `StyleSheet.create` used — no inline style objects
+- [ ] No API keys hardcoded in source
+
+> **Post-MVP hardening:** Zod API validation · SecureStore · React Query migration · Map WebGL cleanup · A11y audit
