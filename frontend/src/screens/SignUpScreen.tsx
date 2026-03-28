@@ -8,12 +8,18 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSignUp, isClerkAPIResponseError } from '@clerk/clerk-expo';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import type { AuthStackParamList } from '../navigation/types';
+
+const { width } = Dimensions.get('window');
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'SignUp'>;
 
@@ -22,12 +28,15 @@ type Step = 'form' | 'verify';
 export const SignUpScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { signUp, setActive, isLoaded } = useSignUp();
+
   const [step, setStep] = useState<Step>('form');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | 'code' | null>(null);
 
   const startSignUp = useCallback(async () => {
     if (!signUp || !setActive) return;
@@ -84,116 +93,355 @@ export const SignUpScreen: React.FC = () => {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 bg-surface items-center justify-center">
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0d631b" />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-surface" edges={['top', 'bottom']}>
+    <View style={styles.container}>
+      {/* Premium Header Background */}
+      <LinearGradient
+        colors={['#0d631b', '#2e7d32', '#4ade80']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
+      >
+        <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
+          <View style={styles.headerContent}>
+            <View style={styles.iconWrapper}>
+              <MaterialIcons name={step === 'form' ? "person-add" : "mark-email-read"} size={36} color="#0d631b" />
+            </View>
+            <Text style={styles.headerTitle}>
+              {step === 'form' ? 'Create account' : 'Check your email'}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              {step === 'form'
+                ? 'Save recipes, pantry, and optimized store routes to your profile.'
+                : `Enter the verification code we sent to ${email.trim()}.`}
+            </Text>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+
+      {/* Main Content Floating Over Header */}
       <KeyboardAvoidingView
-        className="flex-1"
+        style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
-          className="flex-1 px-6"
-          contentContainerStyle={{ paddingTop: 24, paddingBottom: 48 }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <TouchableOpacity onPress={() => navigation.goBack()} className="self-start mb-6 py-2">
-            <Text className="text-secondary font-semibold">← Back</Text>
-          </TouchableOpacity>
-
-          {step === 'form' ? (
-            <>
-              <Text className="text-2xl font-bold text-on-surface mb-2">Create account</Text>
-              <Text className="text-base text-on-surface-variant mb-8">
-                Save recipes, pantry, and optimized store routes to your profile.
-              </Text>
-
-              <View className="gap-4">
-                <View>
-                  <Text className="text-sm font-semibold text-on-surface mb-2">Email</Text>
-                  <TextInput
-                    className="rounded-xl px-4 py-3.5 text-base text-on-surface bg-surface-container-high border border-outline-variant/60"
-                    placeholder="you@example.com"
-                    placeholderTextColor="#707a6c"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                  />
+          <View style={styles.card}>
+            {step === 'form' ? (
+              <>
+                {/* Email Input */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Email address</Text>
+                  <View style={[styles.inputWrapper, focusedField === 'email' && styles.inputWrapperFocused]}>
+                    <MaterialIcons name="email" size={20} color={focusedField === 'email' ? '#0d631b' : '#9ca3af'} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="you@example.com"
+                      placeholderTextColor="#9ca3af"
+                      value={email}
+                      onChangeText={setEmail}
+                      onFocus={() => setFocusedField('email')}
+                      onBlur={() => setFocusedField(null)}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                    />
+                  </View>
                 </View>
-                <View>
-                  <Text className="text-sm font-semibold text-on-surface mb-2">Password</Text>
-                  <TextInput
-                    className="rounded-xl px-4 py-3.5 text-base text-on-surface bg-surface-container-high border border-outline-variant/60"
-                    placeholder="••••••••"
-                    placeholderTextColor="#707a6c"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    textContentType="newPassword"
-                  />
+
+                {/* Password Input */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <View style={[styles.inputWrapper, focusedField === 'password' && styles.inputWrapperFocused]}>
+                    <MaterialIcons name="lock" size={20} color={focusedField === 'password' ? '#0d631b' : '#9ca3af'} style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="••••••••"
+                      placeholderTextColor="#9ca3af"
+                      value={password}
+                      onChangeText={setPassword}
+                      onFocus={() => setFocusedField('password')}
+                      onBlur={() => setFocusedField(null)}
+                      secureTextEntry
+                      textContentType="newPassword"
+                    />
+                  </View>
                 </View>
-              </View>
 
-              <View nativeID="clerk-captcha" className="h-1" />
+                <View nativeID="clerk-captcha" style={{ height: 1 }} />
 
-              {message ? <Text className="text-sm text-error mt-4">{message}</Text> : null}
+                {message ? <Text style={styles.errorText}>{message}</Text> : null}
 
-              <TouchableOpacity
-                onPress={startSignUp}
-                disabled={submitting || !email.trim() || !password}
-                className="mt-8 rounded-xl bg-primary py-4 items-center active:opacity-90 disabled:opacity-40"
-              >
-                {submitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-base font-bold text-on-primary">Sign up</Text>
-                )}
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Text className="text-2xl font-bold text-on-surface mb-2">Check your email</Text>
-              <Text className="text-base text-on-surface-variant mb-8">
-                Enter the verification code we sent to {email.trim()}.
-              </Text>
-              <TextInput
-                className="rounded-xl px-4 py-3.5 text-base text-on-surface bg-surface-container-high border border-outline-variant/60 mb-4"
-                placeholder="6-digit code"
-                placeholderTextColor="#707a6c"
-                value={code}
-                onChangeText={setCode}
-                keyboardType="number-pad"
-                autoComplete="one-time-code"
-              />
-              {message ? <Text className="text-sm text-error mb-4">{message}</Text> : null}
-              <TouchableOpacity
-                onPress={verifyCode}
-                disabled={submitting || code.trim().length < 4}
-                className="rounded-xl bg-primary py-4 items-center active:opacity-90 disabled:opacity-40"
-              >
-                {submitting ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-base font-bold text-on-primary">Verify & continue</Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => signUp?.prepareEmailAddressVerification({ strategy: 'email_code' })}
-                className="mt-4 py-2"
-              >
-                <Text className="text-center text-secondary font-semibold">Resend code</Text>
-              </TouchableOpacity>
-            </>
-          )}
+                {/* Submit Button */}
+                <TouchableOpacity
+                  onPress={startSignUp}
+                  disabled={submitting || !email.trim() || !password}
+                  activeOpacity={0.85}
+                  style={[
+                    styles.submitButtonWrapper,
+                    (submitting || !email.trim() || !password) && styles.submitButtonDisabled
+                  ]}
+                >
+                  <LinearGradient
+                    colors={['#0d631b', '#2e7d32']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.submitButtonGrad}
+                  >
+                    {submitting ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.submitButtonText}>Sign Up</Text>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <View style={styles.footerRow}>
+                  <Text style={styles.footerText}>Already have an account?</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('SignIn')} hitSlop={12}>
+                    <Text style={styles.footerLink}> Sign in</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                {/* Verification Code Input */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Verification Code</Text>
+                  <View style={[styles.inputWrapper, focusedField === 'code' && styles.inputWrapperFocused]}>
+                    <MaterialIcons name="vpn-key" size={20} color={focusedField === 'code' ? '#0d631b' : '#9ca3af'} style={styles.inputIcon} />
+                    <TextInput
+                      style={[styles.input, { fontSize: 22, letterSpacing: 8, textAlign: 'center' }]}
+                      placeholder="000000"
+                      placeholderTextColor="#cbd5e1"
+                      value={code}
+                      onChangeText={setCode}
+                      onFocus={() => setFocusedField('code')}
+                      onBlur={() => setFocusedField(null)}
+                      keyboardType="number-pad"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                    />
+                  </View>
+                </View>
+
+                {message ? <Text style={styles.errorText}>{message}</Text> : null}
+
+                <TouchableOpacity
+                  onPress={verifyCode}
+                  disabled={submitting || code.trim().length < 4}
+                  activeOpacity={0.85}
+                  style={[
+                    styles.submitButtonWrapper,
+                    (submitting || code.trim().length < 4) && styles.submitButtonDisabled
+                  ]}
+                >
+                  <LinearGradient
+                    colors={['#0d631b', '#2e7d32']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.submitButtonGrad}
+                  >
+                    {submitting ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.submitButtonText}>Verify & Continue</Text>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => signUp?.prepareEmailAddressVerification({ strategy: 'email_code' })}
+                  style={styles.resendButton}
+                >
+                  <Text style={styles.resendButtonText}>Resend code</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#f7fbf0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f7fbf0',
+  },
+  headerGradient: {
+    width: '100%',
+    height: 380,
+    position: 'absolute',
+    top: 0,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
+  },
+  headerSafeArea: {
+    flex: 1,
+  },
+  headerContent: {
+    paddingHorizontal: 32,
+    marginTop: 30, // Added margin top since back button is removed
+  },
+  iconWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontWeight: '500',
+    lineHeight: 22,
+  },
+  keyboardView: {
+    flex: 1,
+    marginTop: 220,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 32,
+    padding: 24,
+    paddingTop: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.08,
+    shadowRadius: 36,
+    elevation: 12,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#334155',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    height: 56,
+  },
+  inputWrapperFocused: {
+    borderColor: '#4ade80',
+    backgroundColor: '#ffffff',
+    shadowColor: '#4ade80',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: '500',
+    height: '100%',
+  },
+  errorText: {
+    color: '#ef4444',
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  submitButtonWrapper: {
+    overflow: 'hidden',
+    borderRadius: 18,
+    marginTop: 8,
+    shadowColor: '#0d631b',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  submitButtonGrad: {
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitButtonText: {
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  footerText: {
+    color: '#64748b',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  footerLink: {
+    color: '#0d631b',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  resendButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  resendButtonText: {
+    color: '#0d631b',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+});
