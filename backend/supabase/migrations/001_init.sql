@@ -53,7 +53,22 @@ CREATE INDEX IF NOT EXISTS idx_shopping_user ON shopping_list (user_id);
 CREATE INDEX IF NOT EXISTS idx_shopping_recipe ON shopping_list (user_id, spoonacular_id);
 
 -- ─────────────────────────────────────────────────
--- 4. Recipe search cache (optional, reduces API calls)
+-- 4. Cooked meals — history of meals user has cooked
+-- ─────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS cooked_meals (
+    id               UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id          TEXT        NOT NULL,
+    spoonacular_id   INTEGER     NOT NULL,
+    title            TEXT        NOT NULL,
+    image            TEXT,
+    cooked_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cooked_meals_user ON cooked_meals (user_id);
+CREATE INDEX IF NOT EXISTS idx_cooked_meals_user_time ON cooked_meals (user_id, cooked_at DESC);
+
+-- ─────────────────────────────────────────────────
+-- 5. Recipe search cache (optional, reduces API calls)
 -- ─────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS recipe_cache (
     spoonacular_id  INTEGER     PRIMARY KEY,
