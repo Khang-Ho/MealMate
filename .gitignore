@@ -1,6 +1,7 @@
 # Frontend
 frontend/node_modules/
 frontend/.expo/
+frontend/.env
 
 # Backend
 backend/.venv/
@@ -11,3 +12,6 @@ backend/.env
 # General
 .DS_Store
 *.pyc
+
+# Tooling / IDE caches
+.expo/
