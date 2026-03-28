@@ -14,7 +14,7 @@ import { MapSearchBar } from '../components/MapSearchBar';
 import { MapStoreMarker } from '../components/MapStoreMarker';
 import { StoreCard } from '../components/StoreCard';
 import { Store } from '../types/store';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { RootStackParamList } from '../navigation/types';
 
 type ShoppingMapNavProp = NativeStackNavigationProp<RootStackParamList, 'ShoppingMap'>;
 
@@ -33,8 +33,9 @@ export const ShoppingMapScreen: React.FC = () => {
 
   const handleTabPress = (tabId: string) => {
     if (tabId === 'cook') navigation.navigate('Home');
-    if (tabId === 'inventory') navigation.navigate('IngredientChecklist', {});
+    if (tabId === 'inventory') navigation.navigate('Inventory');
     if (tabId === 'stores') navigation.navigate('MarketMap');
+    if (tabId === 'settings') navigation.navigate('Settings');
   };
 
   return (
@@ -43,7 +44,7 @@ export const ShoppingMapScreen: React.FC = () => {
       style={{ paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0 }}
     >
       <RNStatusBar barStyle="dark-content" />
-      <AppHeader />
+      <AppHeader onProfilePress={() => navigation.navigate('Settings')} />
 
       <View className="flex-1 relative overflow-hidden">
         <ImageBackground
