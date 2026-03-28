@@ -33,9 +33,16 @@ export function useRecipeSuggestions(): UseRecipeSuggestionsResult {
         ingredients: ingredients.join(','),
         number: String(number),
       });
-      const resp = await fetch(`${API_URL}/api/recipes/suggest?${params}`, {
-        signal: AbortSignal.timeout(12000),
-      });
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+      let resp: Response;
+      try {
+        resp = await fetch(`${API_URL}/api/recipes/suggest?${params}`, {
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timer);
+      }
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       setSuggestions(data.results ?? []);

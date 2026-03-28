@@ -52,10 +52,16 @@ function backendToStore(s: BackendStore, index: number): Store {
 
 async function fetchAtRadius(lat: number, lng: number, radiusKm: number): Promise<Store[]> {
   const url = `${API_URL}/api/stores/nearby?lat=${lat}&lng=${lng}&radius_km=${radiusKm}`;
-  const resp = await fetch(url, { signal: AbortSignal.timeout(14000) });
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  const data = await resp.json();
-  return (data.stores as BackendStore[]).map((s, i) => backendToStore(s, i));
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 14000);
+  try {
+    const resp = await fetch(url, { signal: controller.signal });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    return (data.stores as BackendStore[]).map((s, i) => backendToStore(s, i));
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export function useNearbyStores(): UseNearbyStoresResult {
