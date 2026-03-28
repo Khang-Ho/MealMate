@@ -4,10 +4,16 @@ import { useAuth } from '@clerk/clerk-expo';
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
 
 export interface CookedMeal {
-  id: number;
+  rowId?: string;       // UUID from Supabase (undefined for optimistic entries)
+  id: number;           // Spoonacular recipe id
   title: string;
   image: string | null;
   cookedAt: Date;
+}
+
+export interface MarkAsCookedResult {
+  streakIncreased: boolean;
+  newStreak: number;
 }
 
 export interface FavouriteRecipe {
@@ -24,10 +30,13 @@ export interface RecentRecipe {
 
 interface MealHistoryContextValue {
   cookedMeals: CookedMeal[];
+  currentStreak: number;
+  cookedMealsSynced: boolean;
   favourites: FavouriteRecipe[];
   favouritesSynced: boolean;
   recentRecipe: RecentRecipe | null;
-  markAsCooked: (meal: Omit<CookedMeal, 'cookedAt'>) => void;
+  markAsCooked: (meal: Omit<CookedMeal, 'cookedAt' | 'rowId'>) => Promise<MarkAsCookedResult>;
+  removeCooked: (rowId: string) => Promise<void>;
   toggleFavourite: (recipe: FavouriteRecipe) => void;
   isFavourite: (id: number) => boolean;
   setRecentRecipe: (recipe: RecentRecipe) => void;
@@ -35,14 +44,101 @@ interface MealHistoryContextValue {
 
 const MealHistoryContext = createContext<MealHistoryContextValue | null>(null);
 
+function getLocalDateString(d: Date) {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function calculateStreak(meals: CookedMeal[]): number {
+  if (meals.length === 0) return 0;
+  const dates = Array.from(new Set(meals.map(m => getLocalDateString(m.cookedAt))));
+  dates.sort((a, b) => b.localeCompare(a));
+  
+  const todayDate = new Date();
+  const todayStr = getLocalDateString(todayDate);
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterdayDate);
+
+  if (!dates.includes(todayStr) && !dates.includes(yesterdayStr)) {
+    return 0;
+  }
+
+  let streak = 0;
+  let currentCheckDate = dates.includes(todayStr) ? todayDate : yesterdayDate;
+  
+  while (true) {
+    const checkStr = getLocalDateString(currentCheckDate);
+    if (dates.includes(checkStr)) {
+      streak++;
+      currentCheckDate.setDate(currentCheckDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
 export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { userId, isLoaded } = useAuth();
   const [cookedMeals, setCookedMeals] = useState<CookedMeal[]>([]);
+  const [cookedMealsSynced, setCookedMealsSynced] = useState(false);
   const [favourites, setFavourites] = useState<FavouriteRecipe[]>([]);
   const [favouritesSynced, setFavouritesSynced] = useState(false);
   const [recentRecipe, setRecentRecipe] = useState<RecentRecipe | null>(null);
 
-  // Load wishlist from Supabase via FastAPI when Clerk session is ready
+  const currentStreak = calculateStreak(cookedMeals);
+
+  // ── Load cooked meals from API ─────────────────────────────────────────────
+  useEffect(() => {
+    if (!isLoaded || !userId) {
+      setCookedMeals([]);
+      setCookedMealsSynced(true);
+      return;
+    }
+
+    let cancelled = false;
+    setCookedMealsSynced(false);
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `${API_URL}/api/cooked-meals?user_id=${encodeURIComponent(userId)}&limit=50`,
+        );
+        if (!res.ok) {
+          console.warn('[MealHistory] cooked-meals GET failed', res.status);
+          if (!cancelled) setCookedMealsSynced(true);
+          return;
+        }
+        const data = await res.json();
+        const rows = (data.meals ?? []) as {
+          id: string;
+          spoonacular_id: number;
+          title: string;
+          image: string | null;
+          cooked_at: string;
+        }[];
+        const mapped: CookedMeal[] = rows.map((r) => ({
+          rowId: r.id,
+          id: r.spoonacular_id,
+          title: r.title,
+          image: r.image ?? null,
+          cookedAt: new Date(r.cooked_at),
+        }));
+        if (!cancelled) {
+          setCookedMeals(mapped);
+          setCookedMealsSynced(true);
+        }
+      } catch (e) {
+        console.warn('[MealHistory] cooked-meals load error', e);
+        if (!cancelled) setCookedMealsSynced(true);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [isLoaded, userId]);
+
+  // ── Load favourites from API ───────────────────────────────────────────────
   useEffect(() => {
     if (!isLoaded || !userId) {
       setFavourites([]);
@@ -55,8 +151,9 @@ export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     (async () => {
       try {
-        const url = `${API_URL}/api/saved-recipes?user_id=${encodeURIComponent(userId)}`;
-        const res = await fetch(url);
+        const res = await fetch(
+          `${API_URL}/api/saved-recipes?user_id=${encodeURIComponent(userId)}`,
+        );
         if (!res.ok) {
           console.warn('[MealHistory] saved-recipes GET failed', res.status);
           if (!cancelled) setFavouritesSynced(true);
@@ -64,11 +161,13 @@ export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }
         const data = await res.json();
         const rows = data.recipes ?? [];
-        const mapped: FavouriteRecipe[] = rows.map((r: { spoonacular_id: number; title: string; image: string | null }) => ({
-          id: r.spoonacular_id,
-          title: r.title,
-          image: r.image ?? null,
-        }));
+        const mapped: FavouriteRecipe[] = rows.map(
+          (r: { spoonacular_id: number; title: string; image: string | null }) => ({
+            id: r.spoonacular_id,
+            title: r.title,
+            image: r.image ?? null,
+          }),
+        );
         if (!cancelled) {
           setFavourites(mapped);
           setFavouritesSynced(true);
@@ -79,18 +178,73 @@ export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     })();
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [isLoaded, userId]);
 
-  const markAsCooked = useCallback((meal: Omit<CookedMeal, 'cookedAt'>) => {
-    setCookedMeals((prev) => {
-      const filtered = prev.filter((m) => m.id !== meal.id);
-      return [{ ...meal, cookedAt: new Date() }, ...filtered];
-    });
-  }, []);
+  // ── Mark as cooked (optimistic + persist) ─────────────────────────────────
+  const markAsCooked = useCallback(
+    async (meal: Omit<CookedMeal, 'cookedAt' | 'rowId'>): Promise<MarkAsCookedResult> => {
+      const optimistic: CookedMeal = { ...meal, cookedAt: new Date() };
+      const nextMeals = [optimistic, ...cookedMeals.filter((m) => m.id !== meal.id)];
+      
+      const oldStreak = calculateStreak(cookedMeals);
+      const newStreak = calculateStreak(nextMeals);
+      const streakIncreased = newStreak > oldStreak;
 
+      setCookedMeals(nextMeals);
+
+      if (!userId) return { streakIncreased, newStreak };
+
+      try {
+        const res = await fetch(`${API_URL}/api/cooked-meals`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            spoonacular_id: meal.id,
+            title: meal.title,
+            image: meal.image,
+          }),
+        });
+        if (!res.ok) {
+          console.warn('[MealHistory] cooked-meals POST failed', res.status);
+          return { streakIncreased, newStreak };
+        }
+        const row = await res.json();
+        // Backfill rowId from DB response so future deletes work
+        setCookedMeals((prev) =>
+          prev.map((m) =>
+            m.id === meal.id && !m.rowId ? { ...m, rowId: row.id } : m,
+          ),
+        );
+      } catch (e) {
+        console.warn('[MealHistory] cooked-meals save error', e);
+      }
+
+      return { streakIncreased, newStreak };
+    },
+    [userId, cookedMeals],
+  );
+
+  // ── Remove a cooked meal ───────────────────────────────────────────────────
+  const removeCooked = useCallback(
+    async (rowId: string) => {
+      setCookedMeals((prev) => prev.filter((m) => m.rowId !== rowId));
+      if (!userId) return;
+      try {
+        const res = await fetch(
+          `${API_URL}/api/cooked-meals/${rowId}?user_id=${encodeURIComponent(userId)}`,
+          { method: 'DELETE' },
+        );
+        if (!res.ok) console.warn('[MealHistory] cooked-meals DELETE failed', res.status);
+      } catch (e) {
+        console.warn('[MealHistory] cooked-meals delete error', e);
+      }
+    },
+    [userId],
+  );
+
+  // ── Toggle favourite (optimistic + persist) ───────────────────────────────
   const toggleFavourite = useCallback(
     async (recipe: FavouriteRecipe) => {
       if (!userId) {
@@ -107,8 +261,10 @@ export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       try {
         if (exists) {
-          const url = `${API_URL}/api/saved-recipes/${recipe.id}?user_id=${encodeURIComponent(userId)}`;
-          const res = await fetch(url, { method: 'DELETE' });
+          const res = await fetch(
+            `${API_URL}/api/saved-recipes/${recipe.id}?user_id=${encodeURIComponent(userId)}`,
+            { method: 'DELETE' },
+          );
           if (!res.ok) throw new Error(`DELETE ${res.status}`);
         } else {
           const res = await fetch(`${API_URL}/api/saved-recipes`, {
@@ -146,10 +302,13 @@ export const MealHistoryProvider: React.FC<{ children: React.ReactNode }> = ({ c
     <MealHistoryContext.Provider
       value={{
         cookedMeals,
+        currentStreak,
+        cookedMealsSynced,
         favourites,
         favouritesSynced,
         recentRecipe,
         markAsCooked,
+        removeCooked,
         toggleFavourite,
         isFavourite,
         setRecentRecipe: updateRecent,
