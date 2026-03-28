@@ -4,7 +4,24 @@
     "slug": "mealmate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "platforms": ["ios", "android", "web"],
-    "newArchEnabled": true
+    "userInterfaceStyle": "automatic",
+    "scheme": "mealmate",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "newArchEnabled": true,
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": ""
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.anonymous.mealmate"
+    }
   }
 }
