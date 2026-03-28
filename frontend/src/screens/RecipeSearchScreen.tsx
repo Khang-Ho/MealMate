@@ -6,9 +6,8 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
-  Platform,
-  StatusBar as RNStatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -94,15 +93,17 @@ export const RecipeSearchScreen: React.FC = () => {
     }
   }, [query, cuisine, search]);
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View
-      className="flex-1 bg-surface"
-      style={{ paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0 }}
-    >
+    <View className="flex-1 bg-surface">
       <StatusBar style="dark" />
 
       {/* Header */}
-      <View className="flex-row items-center px-5 pt-4 pb-3 gap-3">
+      <View
+        className="flex-row items-center px-5 pb-3 gap-3"
+        style={{ paddingTop: insets.top + 6 }}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="w-10 h-10 rounded-full bg-surface-container items-center justify-center"

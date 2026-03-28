@@ -5,8 +5,6 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  StatusBar as RNStatusBar,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
@@ -87,12 +85,9 @@ export const HomeScreen: React.FC = () => {
   };
 
   return (
-    <View
-      className="flex-1 bg-surface"
-      style={{ paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0 }}
-    >
+    <View className="flex-1 bg-surface">
       <StatusBar style="dark" />
-      <AppHeader onProfilePress={() => navigation.navigate('Settings')} />
+      <AppHeader />
 
       <ScrollView
         className="flex-1"
