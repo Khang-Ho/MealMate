@@ -1,13 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Store } from '../types/store';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
+
+// Radii to try in order when previous radius returns 0 stores
+const RADIUS_STEPS_KM = [5, 10, 20];
 
 export interface UseNearbyStoresResult {
   stores: Store[];
   loading: boolean;
   error: string | null;
-  refetch: (lat: number, lng: number) => Promise<void>;
+  radiusKm: number; // radius that was actually used
+  fetch: (lat: number, lng: number) => Promise<void>;
 }
 
 interface BackendStore {
@@ -32,46 +36,59 @@ function backendToStore(s: BackendStore, index: number): Store {
     lat: s.lat,
     lng: s.lng,
     distance: s.distance_text,
-    driveTime: `${Math.round(s.distance_km * 3)}m drive`,
+    distanceKm: s.distance_km,
+    driveTime: `~${Math.max(1, Math.round(s.distance_km * 3))} min`,
     availableItems: 12,
     totalItems: 12,
-    estimatedCost: 30 + index * 8,
+    estimatedCost: 28 + index * 7,
     isTopPick: index === 0,
-    hasMissingItems: index > 1 && s.is_open === false,
+    hasMissingItems: false,
+    rating: s.rating,
+    totalRatings: s.total_ratings,
+    isOpen: s.is_open,
+    placeId: s.place_id,
   };
 }
 
-export function useNearbyStores(
-  initialLat = 10.7769,
-  initialLng = 106.7009,
-): UseNearbyStoresResult {
+async function fetchAtRadius(lat: number, lng: number, radiusKm: number): Promise<Store[]> {
+  const url = `${API_URL}/api/stores/nearby?lat=${lat}&lng=${lng}&radius_km=${radiusKm}`;
+  const resp = await fetch(url, { signal: AbortSignal.timeout(14000) });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const data = await resp.json();
+  return (data.stores as BackendStore[]).map((s, i) => backendToStore(s, i));
+}
+
+export function useNearbyStores(): UseNearbyStoresResult {
   const [stores, setStores] = useState<Store[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [radiusKm, setRadiusKm] = useState(RADIUS_STEPS_KM[0]);
 
-  const refetch = useCallback(async (lat: number, lng: number) => {
+  const fetchStores = useCallback(async (lat: number, lng: number) => {
     setLoading(true);
     setError(null);
+    setStores([]);
+    setRadiusKm(RADIUS_STEPS_KM[0]);
+
     try {
-      const url = `${API_URL}/api/stores/nearby?lat=${lat}&lng=${lng}&radius_km=5`;
-      const resp = await fetch(url, { signal: AbortSignal.timeout(12000) });
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      setStores(
-        (data.stores as BackendStore[]).map((s, i) => backendToStore(s, i)),
-      );
+      for (const radius of RADIUS_STEPS_KM) {
+        setRadiusKm(radius);
+        const result = await fetchAtRadius(lat, lng, radius);
+        if (result.length > 0) {
+          setStores(result);
+          return;
+        }
+        // 0 results — try next radius (will be reflected in UI via radiusKm state)
+      }
+      // Exhausted all radii — still empty
+      setStores([]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Unknown error';
       setError(msg);
-      console.warn('[useNearbyStores] fetch failed:', msg);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    refetch(initialLat, initialLng);
-  }, [initialLat, initialLng, refetch]);
-
-  return { stores, loading, error, refetch };
+  return { stores, loading, error, radiusKm, fetch: fetchStores };
 }
