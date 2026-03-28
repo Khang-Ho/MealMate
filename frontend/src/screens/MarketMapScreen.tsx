@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,9 @@ import {
   Animated,
   LayoutChangeEvent,
   ListRenderItemInfo,
+  PanResponder,
+  type GestureResponderEvent,
+  type PanResponderGestureState,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -55,8 +58,10 @@ const C = {
 
 const NORMAL_MAP_H = Math.round(SH * 0.38);
 const NAV_H = 80; // BottomNavBar approx height
-const PIN_SIZE = 30; // overlay pin touchable size
+const PIN_SIZE = 40; // overlay pin touchable size
 const MAP_ZOOM = 13.5;
+const ZOOM_MIN = 11;
+const ZOOM_MAX = 18;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -72,6 +77,13 @@ function mercatorFrac(lat: number, lng: number) {
   const sinLat = Math.sin((lat * Math.PI) / 180);
   const y = 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI);
   return { x, y };
+}
+
+/** Mercator fraction → lat/lng */
+function mercatorToLatLng(x: number, y: number) {
+  const lng = x * 360 - 180;
+  const lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((0.5 - y) * 2 * Math.PI)) - Math.PI / 2);
+  return { lat, lng };
 }
 
 /**
@@ -102,20 +114,25 @@ function latLngToPixel(
  * Uses a simple hash of store name + ingredient name so it's consistent
  * across renders. Labeled clearly as estimated in the UI.
  */
-function estimateItemsAvailable(store: Store, missingIngredients: string[]): number {
-  if (missingIngredients.length === 0) return 0;
-  let count = 0;
+function getStoreInventory(store: Store, missingIngredients: string[]) {
+  const available: string[] = [];
+  const missing: string[] = [];
+  if (missingIngredients.length === 0) return { available, missing };
+
   for (const ing of missingIngredients) {
-    // Simple deterministic hash: (sum of char codes of store.name + ing) % 3 !== 0
     let hash = 0;
     for (let i = 0; i < store.name.length + ing.length; i++) {
       const ch = i < store.name.length ? store.name.charCodeAt(i) : ing.charCodeAt(i - store.name.length);
       hash = (hash * 31 + ch) & 0xffff;
     }
     // ~75% chance each item is available (hash % 4 !== 0)
-    if (hash % 4 !== 0) count++;
+    if (hash % 4 !== 0) {
+      available.push(ing);
+    } else {
+      missing.push(ing);
+    }
   }
-  return count;
+  return { available, missing };
 }
 
 /** Mapbox static URL — no custom pins when in full-map mode (we use overlays) */
@@ -175,7 +192,8 @@ const StoreRow = memo(function StoreRow({
 }) {
   const { label, color, bg } = statusMeta(store);
   const total = missingIngredients.length;
-  const hasCount = total > 0 ? estimateItemsAvailable(store, missingIngredients) : 0;
+  const { available } = getStoreInventory(store, missingIngredients);
+  const hasCount = total > 0 ? available.length : 0;
   const hasAll = total > 0 && hasCount === total;
   const hasNone = total > 0 && hasCount === 0;
 
@@ -372,32 +390,51 @@ function InlineSummaryCard({
 
       {/* Missing items availability row */}
       {missingIngredients.length > 0 && (() => {
+        const { available, missing } = getStoreInventory(store, missingIngredients);
         const total = missingIngredients.length;
-        const hasCount = estimateItemsAvailable(store, missingIngredients);
+        const hasCount = available.length;
         const hasAll = hasCount === total;
         const hasNone = hasCount === 0;
         const itemColor = hasAll ? C.green : hasNone ? C.red : C.amber;
         return (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 6,
-              marginBottom: 12,
-              padding: 10,
-              borderRadius: 12,
-              backgroundColor: hasAll ? C.greenLight : hasNone ? C.redLight : C.amberLight,
-            }}
-          >
-            <MaterialIcons
-              name={hasAll ? 'check-circle' : hasNone ? 'cancel' : 'shopping-cart'}
-              size={16}
-              color={itemColor}
-            />
-            <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: itemColor }}>
-              {hasCount}/{total} of your items available here
-            </Text>
-            <Text style={{ fontSize: 10, color: C.slate500, fontStyle: 'italic' }}>est.</Text>
+          <View style={{ marginBottom: 14 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 8,
+                padding: 10,
+                borderRadius: 12,
+                backgroundColor: hasAll ? C.greenLight : hasNone ? C.redLight : C.amberLight,
+              }}
+            >
+              <MaterialIcons
+                name={hasAll ? 'check-circle' : hasNone ? 'cancel' : 'shopping-cart'}
+                size={16}
+                color={itemColor}
+              />
+              <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: itemColor }}>
+                {hasCount}/{total} of your items available here
+              </Text>
+              <Text style={{ fontSize: 10, color: C.slate500, fontStyle: 'italic' }}>est.</Text>
+            </View>
+
+            {/* List the identified items */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              {available.map(ing => (
+                <View key={ing} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.slate100, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+                  <MaterialIcons name="check" size={10} color={C.green} style={{ marginRight: 2 }} />
+                  <Text style={{ fontSize: 11, color: C.slate700, fontWeight: '500' }}>{ing}</Text>
+                </View>
+              ))}
+              {missing.map(ing => (
+                <View key={ing} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.redLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+                  <MaterialIcons name="close" size={10} color={C.red} style={{ marginRight: 2 }} />
+                  <Text style={{ fontSize: 11, color: C.red, fontWeight: '500', textDecorationLine: 'line-through' }}>{ing}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         );
       })()}
@@ -424,7 +461,7 @@ function InlineSummaryCard({
       </View>
 
       {/* Find alternatives if this store has 0 items */}
-      {missingIngredients.length > 0 && estimateItemsAvailable(store, missingIngredients) === 0 && (
+      {missingIngredients.length > 0 && getStoreInventory(store, missingIngredients).available.length === 0 && (
         <TouchableOpacity
           onPress={onFindAlternatives}
           activeOpacity={0.85}
@@ -453,7 +490,7 @@ function InlineSummaryCard({
 
 // ── Full-map mode: small floating description card ────────────────────────────
 
-function MapPopupCard({ store, onClose }: { store: Store; onClose: () => void }) {
+function MapPopupCard({ store, onClose, missingIngredients, onFindAlternatives }: { store: Store; onClose: () => void; missingIngredients: string[]; onFindAlternatives: () => void }) {
   const slideAnim = useRef(new Animated.Value(-20)).current;
   useEffect(() => {
     slideAnim.setValue(-20);
@@ -562,6 +599,82 @@ function MapPopupCard({ store, onClose }: { store: Store; onClose: () => void })
           )}
         </View>
       </View>
+
+      {/* Missing items availability row */}
+      {missingIngredients.length > 0 && (() => {
+        const { available, missing } = getStoreInventory(store, missingIngredients);
+        const total = missingIngredients.length;
+        const hasCount = available.length;
+        const hasAll = hasCount === total;
+        const hasNone = hasCount === 0;
+        const itemColor = hasAll ? C.green : hasNone ? C.red : C.amber;
+        return (
+          <View style={{ marginTop: 2 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 8,
+                padding: 10,
+                borderRadius: 12,
+                backgroundColor: hasAll ? C.greenLight : hasNone ? C.redLight : C.amberLight,
+              }}
+            >
+              <MaterialIcons
+                name={hasAll ? 'check-circle' : hasNone ? 'cancel' : 'shopping-cart'}
+                size={16}
+                color={itemColor}
+              />
+              <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: itemColor }}>
+                {hasCount}/{total} of your items available here
+              </Text>
+              <Text style={{ fontSize: 10, color: C.slate500, fontStyle: 'italic' }}>est.</Text>
+            </View>
+
+            {/* List the identified items */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              {available.map(ing => (
+                <View key={ing} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.slate100, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+                  <MaterialIcons name="check" size={10} color={C.green} style={{ marginRight: 2 }} />
+                  <Text style={{ fontSize: 11, color: C.slate700, fontWeight: '500' }}>{ing}</Text>
+                </View>
+              ))}
+              {missing.map(ing => (
+                <View key={ing} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.redLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+                  <MaterialIcons name="close" size={10} color={C.red} style={{ marginRight: 2 }} />
+                  <Text style={{ fontSize: 11, color: C.red, fontWeight: '500', textDecorationLine: 'line-through' }}>{ing}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Find alternatives if this store has 0 items */}
+            {getStoreInventory(store, missingIngredients).available.length === 0 && (
+              <TouchableOpacity
+                onPress={onFindAlternatives}
+                activeOpacity={0.85}
+                style={{
+                  marginTop: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: 12,
+                  borderRadius: 14,
+                  backgroundColor: C.amberLight,
+                  borderWidth: 1,
+                  borderColor: '#fde68a',
+                }}
+              >
+                <MaterialIcons name="auto-awesome" size={16} color={C.amber} />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: C.amber }}>
+                  Find alternative recipes
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })()}
     </Animated.View>
   );
 }
@@ -822,10 +935,24 @@ export const MarketMapScreen: React.FC = () => {
 
   const [normalMapUrl, setNormalMapUrl] = useState<string | null>(null);
   const [fullMapUrl, setFullMapUrl] = useState<string | null>(null);
+  const [mapImageLoading, setMapImageLoading] = useState(false);
 
   // Full-map view center/zoom — changes when user taps a pin to zoom in
   const [fullCenter, setFullCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [fullZoom, setFullZoom] = useState(MAP_ZOOM);
+
+  const MapboxGL = useMemo(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('@rnmapbox/maps').default;
+      if (MAPBOX_TOKEN) mod.setAccessToken(MAPBOX_TOKEN);
+      return mod;
+    } catch {
+      return null;
+    }
+  }, []);
+  const useNativeMap = !!MapboxGL && Platform.OS !== 'web';
+  const cameraRef = useRef<any>(null);
 
   const topPad = Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0;
   const isLoading = locLoading || loading;
@@ -864,10 +991,34 @@ export const MarketMapScreen: React.FC = () => {
   // ── Rebuild map URLs ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (userLat == null || userLng == null) return;
-    setNormalMapUrl(buildMapUrl(userLat, userLng, selected, stores, SW, NORMAL_MAP_H, true, MAP_ZOOM, userLat, userLng));
+    // By passing 'null' instead of 'selected' to normalMapUrl, it avoids reloading
+    // the static map image entirely when simply tapping different stores in the list mode.
+    setNormalMapUrl(buildMapUrl(userLat, userLng, null, stores, SW, NORMAL_MAP_H, true, MAP_ZOOM, userLat, userLng));
     const fc = fullCenter ?? { lat: userLat, lng: userLng };
-    setFullMapUrl(buildMapUrl(fc.lat, fc.lng, null, stores, mapContainerW, mapContainerH, false, fullZoom, userLat, userLng));
-  }, [userLat, userLng, stores, selected, mapContainerW, mapContainerH, fullCenter, fullZoom]);
+    const newUrl = buildMapUrl(fc.lat, fc.lng, null, stores, mapContainerW, mapContainerH, false, fullZoom, userLat, userLng);
+    if (!useNativeMap && newUrl !== fullMapUrl) setMapImageLoading(true);
+    setFullMapUrl(newUrl);
+  }, [userLat, userLng, stores, mapContainerW, mapContainerH, fullCenter, fullZoom, useNativeMap]);
+
+  // ── Init native Mapbox camera ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!useNativeMap || userLat == null || userLng == null || !cameraRef.current) return;
+    cameraRef.current.setCamera({
+      centerCoordinate: [userLng, userLat],
+      zoomLevel: MAP_ZOOM,
+      animationDuration: 0,
+    });
+  }, [useNativeMap, userLat, userLng]);
+
+  const handleCameraChanged = useCallback((e: any) => {
+    const props = e?.properties ?? {};
+    if (Array.isArray(props.center) && props.center.length >= 2) {
+      setFullCenter({ lng: props.center[0], lat: props.center[1] });
+    }
+    if (typeof props.zoom === 'number') {
+      setFullZoom(props.zoom);
+    }
+  }, []);
 
   // ── Auto-select first store ───────────────────────────────────────────────────
   useEffect(() => {
@@ -934,24 +1085,58 @@ export const MarketMapScreen: React.FC = () => {
     return item.store.id;
   }, []);
 
+  const flyTo = useCallback(
+    (center: { lat: number; lng: number }, zoom: number, duration = 600) => {
+      if (!useNativeMap || !cameraRef.current) return;
+      cameraRef.current.setCamera({
+        centerCoordinate: [center.lng, center.lat],
+        zoomLevel: zoom,
+        animationDuration: duration,
+      });
+    },
+    [useNativeMap],
+  );
+
   // ── Helper: select a store and zoom the full map in on it ──────────────────────
   const selectAndZoom = useCallback((store: Store | null) => {
     setSelected(store);
     if (store?.lat != null && store?.lng != null) {
-      setFullCenter({ lat: store.lat, lng: store.lng });
-      setFullZoom(15.5);
+      const next = { lat: store.lat, lng: store.lng };
+      setFullCenter(next);
+      setFullZoom(16);
+      flyTo(next, 16);
     } else if (userLat != null && userLng != null) {
-      setFullCenter(null); // reset to user location
+      const next = { lat: userLat, lng: userLng };
+      setFullCenter(null);
       setFullZoom(MAP_ZOOM);
+      flyTo(next, MAP_ZOOM, 300);
     }
-  }, [userLat, userLng]);
+  }, [userLat, userLng, flyTo]);
 
   // ── Zoom back out to overview ────────────────────────────────────────────────
   const zoomOut = useCallback(() => {
     setFullCenter(null);
     setFullZoom(MAP_ZOOM);
     setSelected(null);
-  }, []);
+    if (userLat != null && userLng != null) {
+      flyTo({ lat: userLat, lng: userLng }, MAP_ZOOM, 350);
+    }
+  }, [userLat, userLng, flyTo]);
+
+  // ── Manual zoom buttons ───────────────────────────────────────────────────────
+  const zoomIn = useCallback(() => {
+    const next = Math.min(fullZoom + 1, ZOOM_MAX);
+    setFullZoom(next);
+    const center = fullCenter ?? (userLat != null && userLng != null ? { lat: userLat, lng: userLng } : null);
+    if (center) flyTo(center, next, 250);
+  }, [fullZoom, fullCenter, userLat, userLng, flyTo]);
+  const zoomOutStep = useCallback(() => {
+    const next = Math.max(fullZoom - 1, ZOOM_MIN);
+    setFullZoom(next);
+    if (next <= MAP_ZOOM) { setFullCenter(null); setSelected(null); }
+    const center = fullCenter ?? (userLat != null && userLng != null ? { lat: userLat, lng: userLng } : null);
+    if (center) flyTo(center, next, 250);
+  }, [fullZoom, fullCenter, userLat, userLng, flyTo]);
 
   // ── Open alternatives modal ───────────────────────────────────────────────────
   const openAlternatives = useCallback(() => {
@@ -972,6 +1157,120 @@ export const MarketMapScreen: React.FC = () => {
         ...latLngToPixel(s.lat!, s.lng!, pinCenterLat, pinCenterLng, fullZoom, mapContainerW, mapContainerH),
       }))
     : [];
+
+  // ── Pan + Pinch gestures (Expo Go friendly, no native module needed) ──────────
+  const pinchBaseZoom = useRef(fullZoom);
+  const pinchBaseDist = useRef(0);
+  const pinchScaleAnim = useRef(new Animated.Value(1)).current;
+  const panTranslate = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const isPinching = useRef(false);
+  const isPanning = useRef(false);
+  const panBaseCenter = useRef<{ lat: number; lng: number } | null>(null);
+
+  function getTouchDist(touches: { pageX: number; pageY: number }[]) {
+    const dx = touches[0].pageX - touches[1].pageX;
+    const dy = touches[0].pageY - touches[1].pageY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  const mapGestureResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (_: GestureResponderEvent, gs: PanResponderGestureState) => gs.numberActiveTouches === 2,
+      onStartShouldSetPanResponderCapture: (_: GestureResponderEvent, gs: PanResponderGestureState) => gs.numberActiveTouches === 2,
+      onMoveShouldSetPanResponder: (_: GestureResponderEvent, gs: PanResponderGestureState) => {
+        if (gs.numberActiveTouches === 2) return true;
+        if (gs.numberActiveTouches === 1) {
+          return Math.abs(gs.dx) > 4 || Math.abs(gs.dy) > 4;
+        }
+        return false;
+      },
+      onMoveShouldSetPanResponderCapture: (_: GestureResponderEvent, gs: PanResponderGestureState) => {
+        if (gs.numberActiveTouches === 2) return true;
+        if (gs.numberActiveTouches === 1) {
+          return Math.abs(gs.dx) > 3 || Math.abs(gs.dy) > 3;
+        }
+        return false;
+      },
+      onPanResponderGrant: (e: GestureResponderEvent, gs: PanResponderGestureState) => {
+        if (gs.numberActiveTouches === 2 && e.nativeEvent.touches.length === 2) {
+          isPinching.current = true;
+          pinchBaseDist.current = getTouchDist([...e.nativeEvent.touches]);
+          pinchBaseZoom.current = fullZoom;
+          return;
+        }
+        if (gs.numberActiveTouches === 1) {
+          isPanning.current = true;
+          if (userLat != null && userLng != null) {
+            panBaseCenter.current = fullCenter ?? { lat: userLat, lng: userLng };
+          }
+          panTranslate.setValue({ x: 0, y: 0 });
+        }
+      },
+      onPanResponderMove: (e: GestureResponderEvent, gs: PanResponderGestureState) => {
+        if (e.nativeEvent.touches.length === 2 && isPinching.current) {
+          const dist = getTouchDist([...e.nativeEvent.touches]);
+          if (pinchBaseDist.current === 0) return;
+          const scale = dist / pinchBaseDist.current;
+          pinchScaleAnim.setValue(Math.max(0.5, Math.min(scale, 3)));
+          return;
+        }
+        if (e.nativeEvent.touches.length === 1) {
+          if (!isPanning.current) {
+            isPanning.current = true;
+            if (userLat != null && userLng != null) {
+              panBaseCenter.current = fullCenter ?? { lat: userLat, lng: userLng };
+            }
+            panTranslate.setValue({ x: 0, y: 0 });
+          }
+          panTranslate.setValue({ x: gs.dx, y: gs.dy });
+        }
+      },
+      onPanResponderRelease: (e: GestureResponderEvent, gs: PanResponderGestureState) => {
+        if (isPinching.current) {
+          isPinching.current = false;
+          const touches = e.nativeEvent.touches.length >= 2
+            ? [...e.nativeEvent.touches]
+            : e.nativeEvent.changedTouches.length >= 2
+              ? [...e.nativeEvent.changedTouches]
+              : null;
+          if (touches && pinchBaseDist.current > 0) {
+            const dist = getTouchDist(touches);
+            const scale = dist / pinchBaseDist.current;
+            const deltaZoom = Math.log2(Math.max(0.1, scale)) * 1.5;
+            const newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX,
+              pinchBaseZoom.current + deltaZoom));
+            const snapped = Math.round(newZoom * 2) / 2;
+            pinchScaleAnim.setValue(1);
+            setFullZoom(snapped);
+            if (snapped <= MAP_ZOOM) { setFullCenter(null); setSelected(null); }
+          } else {
+            pinchScaleAnim.setValue(1);
+          }
+        }
+
+        if (isPanning.current) {
+          isPanning.current = false;
+          const base = panBaseCenter.current;
+          if (base) {
+            const worldPx = Math.pow(2, fullZoom) * 256;
+            const frac = mercatorFrac(base.lat, base.lng);
+            const nextX = frac.x - gs.dx / worldPx;
+            const nextY = frac.y - gs.dy / worldPx;
+            const clampedY = Math.max(0.02, Math.min(0.98, nextY));
+            const next = mercatorToLatLng(nextX, clampedY);
+            setFullCenter(next);
+          }
+          panTranslate.setValue({ x: 0, y: 0 });
+        }
+      },
+      onPanResponderTerminate: () => {
+        isPinching.current = false;
+        isPanning.current = false;
+        pinchScaleAnim.setValue(1);
+        panTranslate.setValue({ x: 0, y: 0 });
+      },
+    }),
+  ).current;
 
   return (
     <View style={{ flex: 1, backgroundColor: C.slate100, paddingTop: topPad }}>
@@ -1020,7 +1319,6 @@ export const MarketMapScreen: React.FC = () => {
         <TouchableOpacity
           onPress={() => {
             if (mapExpanded) {
-              // going back to list: reset zoom
               setFullCenter(null);
               setFullZoom(MAP_ZOOM);
             }
@@ -1028,16 +1326,25 @@ export const MarketMapScreen: React.FC = () => {
           }}
           activeOpacity={0.75}
           style={{
-            width: 34, height: 34, borderRadius: 17,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5,
+            paddingHorizontal: 12,
+            paddingVertical: 7,
+            borderRadius: 20,
             backgroundColor: mapExpanded ? C.green : C.greenLight,
-            alignItems: 'center', justifyContent: 'center',
+            borderWidth: 1.5,
+            borderColor: mapExpanded ? C.green : '#bbf7d0',
           }}
         >
           <MaterialIcons
             name={mapExpanded ? 'view-list' : 'map'}
-            size={19}
+            size={15}
             color={mapExpanded ? C.white : C.green}
           />
+          <Text style={{ fontSize: 12, fontWeight: '700', color: mapExpanded ? C.white : C.green }}>
+            {mapExpanded ? 'List' : 'Full Map'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -1123,93 +1430,231 @@ export const MarketMapScreen: React.FC = () => {
          ════════════════════════════════════════════════════════════════ */}
       {mapExpanded ? (
         <View style={{ flex: 1, position: 'relative' }} onLayout={onMapLayout}>
-          {/* Map image */}
-          {fullMapUrl ? (
-            <Image
-              key={fullMapUrl}
-              source={{ uri: fullMapUrl }}
-              style={{ width: '100%', height: '100%' }}
-              resizeMode="cover"
-            />
+          {useNativeMap ? (
+            <View style={{ flex: 1 }}>
+              <MapboxGL.MapView
+                style={{ flex: 1 }}
+                styleURL="mapbox://styles/mapbox/light-v11"
+                compassEnabled
+                scaleBarEnabled={false}
+                logoEnabled={false}
+                attributionEnabled={false}
+                onCameraChanged={handleCameraChanged}
+              >
+                <MapboxGL.Camera ref={cameraRef} />
+                <MapboxGL.UserLocation visible animated />
+
+                {(stores ?? []).map((store, idx) =>
+                  store.lat != null && store.lng != null ? (
+                    <MapboxGL.MarkerView
+                      key={store.id}
+                      id={store.id}
+                      coordinate={[store.lng, store.lat]}
+                    >
+                      <TouchableOpacity
+                        onPress={() => selectAndZoom(store)}
+                        activeOpacity={0.85}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 20,
+                          backgroundColor: selected?.id === store.id ? C.orange : statusMeta(store).color,
+                          borderWidth: 3,
+                          borderColor: C.white,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 3 },
+                          shadowOpacity: 0.35,
+                          shadowRadius: 5,
+                          elevation: 8,
+                        }}
+                      >
+                        <Text style={{ fontSize: 13, fontWeight: '900', color: C.white }}>
+                          {idx + 1}
+                        </Text>
+                      </TouchableOpacity>
+                    </MapboxGL.MarkerView>
+                  ) : null,
+                )}
+              </MapboxGL.MapView>
+            </View>
           ) : (
-            <View style={{ flex: 1, backgroundColor: '#dde6d5', alignItems: 'center', justifyContent: 'center' }}>
-              {isLoading
-                ? <ActivityIndicator size="large" color={C.green} />
-                : <MaterialIcons name="map" size={44} color={C.slate300} />}
+            <>
+              {/* Map image — static fallback with PanResponder */}
+              <Animated.View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  transform: [
+                    { translateX: panTranslate.x },
+                    { translateY: panTranslate.y },
+                    { scale: pinchScaleAnim },
+                  ],
+                }}
+                {...mapGestureResponder.panHandlers}
+              >
+                {fullMapUrl ? (
+                  <Image
+                    key={fullMapUrl}
+                    source={{ uri: fullMapUrl }}
+                    style={{ width: '100%', height: '100%' }}
+                    resizeMode="cover"
+                    onLoadEnd={() => setMapImageLoading(false)}
+                  />
+                ) : (
+                  <View style={{ flex: 1, backgroundColor: '#dde6d5', alignItems: 'center', justifyContent: 'center' }}>
+                    {isLoading
+                      ? <ActivityIndicator size="large" color={C.green} />
+                      : <MaterialIcons name="map" size={44} color={C.slate300} />}
+                  </View>
+                )}
+              </Animated.View>
+
+              {/* ── Overlay tappable pins (static map) ───────────────────── */}
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  transform: [
+                    { translateX: panTranslate.x },
+                    { translateY: panTranslate.y },
+                    { scale: pinchScaleAnim },
+                  ],
+                }}
+                pointerEvents="box-none"
+              >
+                {overlayPins.map(({ store, x, y }, idx) => {
+                  const isSel = selected?.id === store.id;
+                  const { color } = statusMeta(store);
+                  // Skip pins far outside visible area
+                  if (x < -40 || x > mapContainerW + 40 || y < -40 || y > mapContainerH + 40) return null;
+                  return (
+                    <TouchableOpacity
+                      key={store.id}
+                      onPress={() => selectAndZoom(isSel ? null : store)}
+                      activeOpacity={0.75}
+                      hitSlop={8}
+                      style={{
+                        position: 'absolute',
+                        left: x - PIN_SIZE / 2,
+                        top: y - PIN_SIZE / 2,
+                        width: PIN_SIZE,
+                        height: PIN_SIZE,
+                        borderRadius: PIN_SIZE / 2,
+                        backgroundColor: isSel ? C.orange : color,
+                        borderWidth: 3,
+                        borderColor: C.white,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 3 },
+                        shadowOpacity: 0.35,
+                        shadowRadius: 5,
+                        elevation: 8,
+                        transform: [{ scale: isSel ? 1.35 : 1 }],
+                      }}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '900', color: C.white }}>
+                        {idx + 1}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </Animated.View>
+            </>
+          )}
+
+          {/* ── Map loading overlay (static only) ─────────────────────── */}
+          {!useNativeMap && mapImageLoading && (
+            <View
+              style={{
+                position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                backgroundColor: 'rgba(255,255,255,0.55)',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+              pointerEvents="none"
+            >
+              <ActivityIndicator size="large" color={C.green} />
             </View>
           )}
 
-          {/* ── Overlay tappable pins ─────────────────────────────────── */}
-          {overlayPins.map(({ store, x, y }, idx) => {
-            const isSel = selected?.id === store.id;
-            const { color } = statusMeta(store);
-            // Skip pins far outside visible area
-            if (x < -40 || x > mapContainerW + 40 || y < -40 || y > mapContainerH + 40) return null;
-            return (
-              <TouchableOpacity
-                key={store.id}
-                onPress={() => selectAndZoom(isSel ? null : store)}
-                activeOpacity={0.8}
-                style={{
-                  position: 'absolute',
-                  left: x - PIN_SIZE / 2,
-                  top: y - PIN_SIZE / 2,
-                  width: PIN_SIZE,
-                  height: PIN_SIZE,
-                  borderRadius: PIN_SIZE / 2,
-                  backgroundColor: isSel ? C.orange : color,
-                  borderWidth: 2.5,
-                  borderColor: C.white,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 4,
-                  elevation: 6,
-                  transform: [{ scale: isSel ? 1.25 : 1 }],
-                }}
-              >
-                <Text style={{ fontSize: 10, fontWeight: '800', color: C.white }}>
-                  {idx + 1}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-
-          {/* ── Zoom-out button (shows when zoomed in on a store) ─────── */}
-          {fullZoom > MAP_ZOOM + 0.5 && (
+          {/* ── Zoom buttons (right side) ─────────────────────────────── */}
+          <View
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: selected ? 130 : 12,
+              gap: 6,
+            }}
+          >
+            {/* Zoom In */}
             <TouchableOpacity
-              onPress={zoomOut}
-              activeOpacity={0.85}
+              onPress={zoomIn}
+              activeOpacity={0.8}
+              disabled={fullZoom >= ZOOM_MAX}
               style={{
-                position: 'absolute',
-                top: selected ? 120 : 12,
-                right: 12,
-                backgroundColor: C.white,
-                borderRadius: 24,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 4,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.12,
-                shadowRadius: 6,
-                elevation: 6,
-                borderWidth: 1,
-                borderColor: C.slate200,
+                width: 40, height: 40, borderRadius: 20,
+                backgroundColor: fullZoom >= ZOOM_MAX ? C.slate200 : C.white,
+                alignItems: 'center', justifyContent: 'center',
+                shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15, shadowRadius: 4, elevation: 5,
+                borderWidth: 1, borderColor: C.slate200,
               }}
             >
-              <MaterialIcons name="zoom-out-map" size={15} color={C.green} />
-              <Text style={{ fontSize: 11, fontWeight: '700', color: C.green }}>Zoom out</Text>
+              <MaterialIcons name="add" size={22} color={fullZoom >= ZOOM_MAX ? C.slate300 : C.slate700} />
             </TouchableOpacity>
-          )}
+            {/* Zoom level badge */}
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 9, fontWeight: '700', color: C.slate500 }}>
+                {Math.round(fullZoom)}x
+              </Text>
+            </View>
+            {/* Zoom Out */}
+            <TouchableOpacity
+              onPress={zoomOutStep}
+              activeOpacity={0.8}
+              disabled={fullZoom <= ZOOM_MIN}
+              style={{
+                width: 40, height: 40, borderRadius: 20,
+                backgroundColor: fullZoom <= ZOOM_MIN ? C.slate200 : C.white,
+                alignItems: 'center', justifyContent: 'center',
+                shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.15, shadowRadius: 4, elevation: 5,
+                borderWidth: 1, borderColor: C.slate200,
+              }}
+            >
+              <MaterialIcons name="remove" size={22} color={fullZoom <= ZOOM_MIN ? C.slate300 : C.slate700} />
+            </TouchableOpacity>
+            {/* Reset overview button */}
+            {fullZoom > MAP_ZOOM + 0.5 && (
+              <TouchableOpacity
+                onPress={zoomOut}
+                activeOpacity={0.85}
+                style={{
+                  width: 40, height: 40, borderRadius: 20,
+                  backgroundColor: C.greenLight,
+                  alignItems: 'center', justifyContent: 'center',
+                  shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.12, shadowRadius: 4, elevation: 4,
+                  borderWidth: 1, borderColor: '#bbf7d0',
+                }}
+              >
+                <MaterialIcons name="zoom-out-map" size={18} color={C.green} />
+              </TouchableOpacity>
+            )}
+            {/* Pinch hint */}
+            <View style={{ alignItems: 'center', marginTop: 4 }}>
+              <MaterialIcons name="pinch" size={16} color={C.slate300} />
+            </View>
+          </View>
 
           {/* ── Small popup card (top of map) ─────────────────────────── */}
           {selected != null && !isLoading && (
-            <MapPopupCard store={selected} onClose={zoomOut} />
+            <MapPopupCard store={selected} onClose={zoomOut} missingIngredients={missingIngredients} onFindAlternatives={openAlternatives} />
           )}
 
           {/* ── Bottom horizontal store chips ─────────────────────────── */}
@@ -1266,14 +1711,16 @@ export const MarketMapScreen: React.FC = () => {
             )}
             <View
               style={{
-                position: 'absolute', bottom: 8, right: 8,
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20,
-                flexDirection: 'row', alignItems: 'center', gap: 4,
+                position: 'absolute', bottom: 10, right: 10,
+                backgroundColor: C.green,
+                paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
+                flexDirection: 'row', alignItems: 'center', gap: 5,
+                shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2, shadowRadius: 4, elevation: 4,
               }}
             >
-              <MaterialIcons name="open-in-full" size={10} color={C.slate700} />
-              <Text style={{ fontSize: 10, fontWeight: '600', color: C.slate700 }}>Expand map</Text>
+              <MaterialIcons name="open-in-full" size={13} color={C.white} />
+              <Text style={{ fontSize: 12, fontWeight: '700', color: C.white }}>Expand map</Text>
             </View>
           </TouchableOpacity>
 
