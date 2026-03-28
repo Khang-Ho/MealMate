@@ -6,6 +6,7 @@ import logging
 from app.core.config import settings
 from app.api.routes import stores as stores_router
 from app.api.routes import recipes as recipes_router
+from app.api.routes import saved_recipes as saved_recipes_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ app.add_middleware(
 
 app.include_router(stores_router.router, prefix="/api")
 app.include_router(recipes_router.router, prefix="/api")
+app.include_router(saved_recipes_router.router, prefix="/api")
 
 
 @app.exception_handler(Exception)
@@ -43,4 +45,7 @@ async def health_check():
         "mapbox": bool(settings.mapbox_access_token),
         "gemini": bool(settings.gemini_api_key),
         "spoonacular": bool(settings.spoonacular_api_key),
+        "supabase_saved_recipes": bool(
+            settings.supabase_url and (settings.supabase_service_role_key or settings.supabase_anon_key)
+        ),
     }
