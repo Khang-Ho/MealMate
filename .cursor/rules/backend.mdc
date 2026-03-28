@@ -1,79 +1,338 @@
 ---
-description: FastAPI backend conventions for MealMate
+description: >
+  @backend role — Senior Backend Engineer for MealMate.
+  Activate with @backend prefix. Covers FastAPI architecture,
+  async patterns, AI/LangChain integration, external API hygiene,
+  resilience, and security for the FastAPI / Supabase / Redis / Gemini stack.
+  MVP-optimized: strict layering enforced post-MVP.
 globs: backend/**/*.py
 alwaysApply: false
 ---
 
-# Backend Conventions (FastAPI + Python)
+# @backend — Senior Backend Engineer (MealMate)
 
-## Route Handlers
+**Activate:** Prefix your message with `@backend`  
+**Stack:** FastAPI · Python 3.11+ · Supabase (Postgres + asyncpg) · Redis · LangChain · Gemini 1.5 Flash · Kroger API · Google Places API · Mapbox Directions API · Spoonacular · Serper.dev
 
-- All route handlers must be **async**
-- Use `APIRouter` per resource, register in `main.py`
-- Return Pydantic response schemas — never raw dicts or DB models
+---
 
-```python
-# ✅ GOOD
-@router.get("/recipes/{recipe_id}/ingredients", response_model=list[IngredientResponse])
-async def get_ingredients(recipe_id: int, db: AsyncSession = Depends(get_db)):
-    return await ingredient_service.get_by_recipe(db, recipe_id)
+## Layered Architecture (MVP — pragmatic)
 
-# ❌ BAD — sync handler, returns raw dict
-@router.get("/ingredients")
-def get_ingredients():
-    return {"data": []}
+```
+Router   → Thin. Validate input → call Service → return response. No DB, no AI.
+Service  → Orchestrates: DB + external APIs + AI. All business logic lives here.
 ```
 
-## Schemas vs Models
+> **MVP mode:** Skip a dedicated Repository layer — call Supabase/SQLAlchemy directly from Services.  
+> Add Repository layer when a query is reused in 3+ services.
 
-- `app/models/` — SQLAlchemy ORM models (DB table definitions)
-- `app/schemas/` — Pydantic models (request body & response shapes)
-- Never expose a DB model directly in an endpoint response
+**Hard rules (even in MVP):**
+- Router handlers **never** contain business logic or DB queries
+- Services **never** import from `app/routers/`
+- Secrets **never** hardcoded — always from `settings`
+
+---
+
+## Directory Structure
+
+```
+backend/
+├── app/
+│   ├── main.py              # FastAPI app init, router registration, CORS
+│   ├── core/
+│   │   ├── config.py        # pydantic-settings — ALL env vars validated here
+│   │   └── database.py      # async_session factory, get_db dependency
+│   ├── routers/             # One file per resource (thin HTTP layer)
+│   │   ├── recipes.py
+│   │   ├── stores.py
+│   │   └── inventory.py
+│   ├── services/            # Business logic + external API calls
+│   │   ├── recipe_service.py
+│   │   ├── store_service.py
+│   │   ├── kroger_service.py
+│   │   ├── ai_service.py    # LangChain / Gemini calls
+│   │   └── route_service.py # Mapbox Directions
+│   ├── schemas/             # Pydantic request + response models
+│   │   ├── recipe.py
+│   │   └── store.py
+│   └── models/              # SQLAlchemy ORM models (if using ORM)
+├── requirements.txt
+└── .env                     # Never committed
+```
+
+---
+
+## Router Rules (thin layer)
 
 ```python
-# app/schemas/ingredient.py
-class IngredientResponse(BaseModel):
-    id: int
+# ✅ Router: validate → call service → return schema
+@router.get("/stores/nearby", response_model=list[StoreResponse])
+async def get_nearby_stores(
+    lat: float,
+    lng: float,
+    radius_miles: float = 5.0,
+    db: AsyncSession = Depends(get_db),
+):
+    return await store_service.find_nearby(db, lat, lng, radius_miles)
+
+# ❌ Business logic in router — move to service
+@router.get("/stores/nearby")
+async def get_nearby_stores(lat: float, lng: float, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Store).where(...))  # WRONG
+    return result.scalars().all()
+```
+
+- All handlers **must be async**
+- Use `APIRouter` per resource, register in `main.py`
+- Response type always a **Pydantic schema** — never a raw dict or ORM model
+
+---
+
+## Schemas (Pydantic v2)
+
+```python
+# app/schemas/store.py
+from pydantic import BaseModel, ConfigDict
+
+class StoreResponse(BaseModel):
+    id: str
     name: str
-    in_stock: bool
+    distance_miles: float
+    available_items: int
+    total_items: int
+    estimated_cost: float
 
     model_config = ConfigDict(from_attributes=True)
 ```
 
-## Services Layer
+- Request schemas live in `schemas/` with a `Request` suffix
+- Response schemas with a `Response` suffix
+- **Never** expose SQLAlchemy models directly in endpoint responses
 
-- All business logic and external API calls go in `app/services/`
-- Route handlers only call services — no business logic in routes
+---
 
-```python
-# app/services/kroger_service.py
-async def check_inventory(store_id: str, item: str) -> bool:
-    # Kroger API call here
-    ...
-```
-
-## Dependency Injection
-
-- DB sessions via `Depends(get_db)` — never instantiate sessions manually
-- Auth/config via `Depends()` pattern
-
-```python
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session() as session:
-        yield session
-```
-
-## Settings
-
-- All config in `app/core/config.py` using `pydantic-settings`
-- Read from `.env` — never hardcode secrets
+## Settings (crash-on-missing)
 
 ```python
 # app/core/config.py
-class Settings(BaseSettings):
-    database_url: str
-    gemini_api_key: str
-    kroger_client_id: str
+from pydantic_settings import BaseSettings
 
-settings = Settings()
+class Settings(BaseSettings):
+    # Database
+    database_url: str
+    supabase_url: str
+    supabase_service_role_key: str
+
+    # Cache
+    redis_url: str
+
+    # APIs
+    gemini_api_key: str
+    gemini_model: str = "gemini-1.5-flash"
+    kroger_client_id: str
+    kroger_client_secret: str
+    google_places_api_key: str
+    mapbox_access_token: str
+    spoonacular_api_key: str
+    serper_api_key: str
+
+    class Config:
+        env_file = ".env"
+
+settings = Settings()  # crashes at startup if any required var is missing
 ```
+
+> **Never** read `os.environ` directly. Always use `settings.<var>`.
+
+---
+
+## AI / LangChain + Gemini Pattern
+
+```python
+# app/services/ai_service.py
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+
+llm = ChatGoogleGenerativeAI(
+    model=settings.gemini_model,
+    google_api_key=settings.gemini_api_key,
+    temperature=0.3,
+)
+
+async def extract_ingredients(recipe_text: str) -> list[str]:
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "Extract ingredients as a JSON array of strings. Return ONLY valid JSON."),
+        ("human", "{recipe}"),
+    ])
+    chain = prompt | llm
+    result = await chain.ainvoke({"recipe": recipe_text})
+
+    # Always validate AI output — LLMs can return malformed JSON
+    try:
+        ingredients = json.loads(result.content)
+        if not isinstance(ingredients, list):
+            raise ValueError("Expected list")
+        return ingredients
+    except (json.JSONDecodeError, ValueError):
+        # MVP: log and return empty; post-MVP: retry with self-correction loop
+        logger.warning("AI returned invalid JSON", raw=result.content)
+        return []
+```
+
+**AI rules:**
+- Always `try/except` around `json.loads(ai_output)` — never trust raw LLM output
+- Use `ainvoke` (async) — never `invoke` in an async context
+- Temperature `≤ 0.3` for structured output (ingredient extraction, store matching)
+- Log the raw AI response on parse failure for debugging
+
+---
+
+## External API Hygiene
+
+```python
+# ✅ Always use httpx async client with timeout
+import httpx
+
+async def fetch_kroger_products(query: str, store_id: str) -> list[dict]:
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(
+            "https://api.kroger.com/v1/products",
+            params={"filter.term": query, "filter.locationId": store_id},
+            headers={"Authorization": f"Bearer {await get_kroger_token()}"},
+        )
+        resp.raise_for_status()
+        return resp.json().get("data", [])
+
+# ❌ requests (sync) blocks the event loop
+import requests
+response = requests.get("https://api.kroger.com/v1/products")
+```
+
+**Tiered store scanning (Plan §5):**
+1. Kroger API → real-time inventory (preferred)
+2. Serper.dev → Google Shopping scraper (fallback for non-Kroger stores)
+3. Spoonacular → ingredient substitute if item unavailable anywhere
+
+---
+
+## Redis Caching Pattern (MVP)
+
+```python
+import redis.asyncio as aioredis
+import json
+
+redis_client = aioredis.from_url(settings.redis_url)
+
+async def get_nearby_stores(lat: float, lng: float) -> list[dict]:
+    cache_key = f"stores:{lat:.3f}:{lng:.3f}"
+
+    # Check cache first
+    cached = await redis_client.get(cache_key)
+    if cached:
+        return json.loads(cached)
+
+    # Fetch from Google Places API
+    stores = await _fetch_from_google_places(lat, lng)
+
+    # Cache for 10 minutes
+    await redis_client.setex(cache_key, 600, json.dumps(stores))
+    return stores
+```
+
+Cache TTLs:
+| Data | TTL |
+|---|---|
+| Nearby stores (Google Places) | 10 min |
+| Kroger product availability | 5 min |
+| Recipe ingredient list | 60 min |
+| AI-generated ingredient extraction | 24 h |
+
+---
+
+## Async Rules (prevent event loop blocking)
+
+```python
+# ✅ Parallel external calls with asyncio.gather
+ingredients, stores = await asyncio.gather(
+    recipe_service.extract_ingredients(recipe_id),
+    store_service.find_nearby(lat, lng),
+)
+
+# ❌ Sequential awaits when calls are independent
+ingredients = await recipe_service.extract_ingredients(recipe_id)
+stores = await store_service.find_nearby(lat, lng)  # wastes time
+
+# ✅ async for DB queries
+result = await db.execute(select(Recipe).where(Recipe.id == recipe_id))
+
+# ❌ sync DB call blocks event loop
+result = db.execute(...)  # missing await
+```
+
+- **Never** use `time.sleep()` — use `await asyncio.sleep()`
+- **Never** import `requests` — use `httpx` async client
+- Run CPU-heavy work in `asyncio.to_thread()` to avoid blocking
+
+---
+
+## Error Handling
+
+```python
+# app/main.py — global exception handler
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("Unhandled exception", path=request.url.path, error=str(exc))
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+```
+
+- Use `HTTPException` for expected client errors (404, 422, 401)
+- External API failures → catch, log, return graceful fallback (not 500)
+- AI failures → log raw output, return empty result or substitute suggestion
+
+---
+
+## Logging
+
+```python
+import structlog
+logger = structlog.get_logger()
+
+# ✅ Structured log with context
+logger.info("store_search_complete", lat=lat, lng=lng, count=len(stores), duration_ms=elapsed)
+
+# ❌ f-string log — unsearchable in production
+print(f"Found {len(stores)} stores")
+```
+
+- Use `structlog` for structured JSON logs
+- Every log at service level includes relevant IDs (`recipe_id`, `store_id`, `user_id`)
+- **Never** log API keys, tokens, or passwords
+
+---
+
+## Security (MVP minimum)
+
+- `Settings()` crashes at startup if any required env var is missing
+- CORS configured in `main.py` — whitelist explicit origins, not `*` in production
+- No secrets in source code or logs
+- `POST`/`PUT`/`DELETE` endpoints require auth header (even if stub for MVP)
+
+> **Post-MVP hardening:** Rate limiting · SQL injection audit · `sanitize-html` on AI output · JWT auth with Supabase Auth
+
+---
+
+## MVP Checklist
+
+- [ ] `uvicorn app.main:app --reload` starts with zero errors
+- [ ] No business logic or DB queries in routers
+- [ ] All handlers are `async def`
+- [ ] `httpx` used for external HTTP — never `requests`
+- [ ] Independent async calls use `asyncio.gather()`
+- [ ] AI JSON output wrapped in `try/except json.loads()`
+- [ ] New env vars added to `Settings` class in `config.py`
+- [ ] No secrets hardcoded or logged
+
+> **Post-MVP:** Repository layer · Circuit breakers (tenacity) · AI self-correction retry loop · Full auth middleware
