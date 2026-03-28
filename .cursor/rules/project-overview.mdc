@@ -14,7 +14,7 @@ A mobile app that helps users optimize grocery shopping for meal prep using real
 | Frontend    | React Native (Expo) + TypeScript  |
 | Map Engine  | Mapbox SDK (`@rnmapbox/maps`)     |
 | Backend     | FastAPI (Python 3.11+)            |
-| Database    | PostgreSQL + PostGIS               |
+| Database    | Supabase (Postgres)               |
 | Cache       | Redis                             |
 | AI          | Gemini 1.5 Flash (via LangChain)  |
 
