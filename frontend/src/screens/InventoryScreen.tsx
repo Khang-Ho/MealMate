@@ -107,13 +107,12 @@ function FavouriteRow({ recipe, onPress, onRemove }: { recipe: FavouriteRecipe; 
 
 export const InventoryScreen: React.FC = () => {
   const navigation = useNavigation<InventoryNavProp>();
-  const { cookedMeals, favourites, toggleFavourite, markAsCooked } = useMealHistory();
+  const { cookedMeals, favourites, toggleFavourite } = useMealHistory();
   const [activeTab, setActiveTab] = useState<TabId>('history');
 
   const handleTabPress = (tabId: string) => {
     if (tabId === 'cook') navigation.navigate('Home');
-    if (tabId === 'stores') navigation.navigate('MarketMap');
-    if (tabId === 'route') navigation.navigate('ShoppingMap');
+    if (tabId === 'stores') navigation.navigate('MarketMap', undefined);
     if (tabId === 'settings') navigation.navigate('Settings');
   };
 

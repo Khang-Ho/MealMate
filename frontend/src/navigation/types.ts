@@ -7,8 +7,7 @@ export type RootStackParamList = {
     recipeImage?: string;
   };
   Inventory: undefined;
-  MarketMap: undefined;
-  ShoppingMap: undefined;
+  MarketMap: { missingIngredients?: string[] } | undefined;
   Settings: undefined;
 };
 

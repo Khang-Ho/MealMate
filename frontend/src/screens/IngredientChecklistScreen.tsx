@@ -147,8 +147,7 @@ export const IngredientChecklistScreen: React.FC = () => {
   const handleTabPress = (tabId: string) => {
     if (tabId === 'cook') navigation.navigate('Home');
     if (tabId === 'inventory') navigation.navigate('Inventory');
-    if (tabId === 'stores') navigation.navigate('MarketMap');
-    if (tabId === 'route') navigation.navigate('ShoppingMap');
+    if (tabId === 'stores') navigation.navigate('MarketMap', undefined);
     if (tabId === 'settings') navigation.navigate('Settings');
   };
 
@@ -312,7 +311,11 @@ export const IngredientChecklistScreen: React.FC = () => {
             <View className="gap-3 mt-2">
               {needList.length > 0 && (
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('MarketMap')}
+                  onPress={() =>
+                    navigation.navigate('MarketMap', {
+                      missingIngredients: needList.map(({ ing }) => ing.name),
+                    })
+                  }
                   className="flex-row items-center justify-center gap-2 py-4 rounded-2xl bg-primary"
                   activeOpacity={0.85}
                   style={{ shadowColor: '#0d631b', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10, elevation: 4 }}

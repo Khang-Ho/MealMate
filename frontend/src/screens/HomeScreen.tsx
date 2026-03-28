@@ -74,8 +74,7 @@ export const HomeScreen: React.FC = () => {
 
   const handleTabPress = (tabId: string) => {
     if (tabId === 'inventory') navigation.navigate('Inventory');
-    if (tabId === 'stores') navigation.navigate('MarketMap');
-    if (tabId === 'route') navigation.navigate('ShoppingMap');
+    if (tabId === 'stores') navigation.navigate('MarketMap', undefined);
     if (tabId === 'settings') navigation.navigate('Settings');
   };
 

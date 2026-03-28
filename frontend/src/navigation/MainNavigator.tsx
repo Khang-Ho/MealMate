@@ -5,7 +5,6 @@ import { RecipeSearchScreen } from '../screens/RecipeSearchScreen';
 import { IngredientChecklistScreen } from '../screens/IngredientChecklistScreen';
 import { InventoryScreen } from '../screens/InventoryScreen';
 import { MarketMapScreen } from '../screens/MarketMapScreen';
-import { ShoppingMapScreen } from '../screens/ShoppingMapScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import type { RootStackParamList } from './types';
 
@@ -23,11 +22,6 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen
       name="MarketMap"
       component={MarketMapScreen}
-      options={{ animation: 'slide_from_bottom' }}
-    />
-    <Stack.Screen
-      name="ShoppingMap"
-      component={ShoppingMapScreen}
       options={{ animation: 'slide_from_bottom' }}
     />
     <Stack.Screen name="Settings" component={SettingsScreen} />
