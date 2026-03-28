@@ -95,8 +95,16 @@ async def search_recipes(
 
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.get(f"{BASE}/recipes/complexSearch", params=params)
-        resp.raise_for_status()
-        data = resp.json()
+
+    if resp.status_code == 402:
+        log.warning("Spoonacular quota exceeded (402) — returning mock results for search")
+        filtered = MOCK_RECIPES
+        if cuisine:
+            filtered = [r for r in filtered if any(c.lower() == cuisine.lower() for c in r["cuisines"])]
+        return {"results": filtered[:number], "totalResults": len(filtered)}
+
+    resp.raise_for_status()
+    data = resp.json()
 
     # Summarise heavy HTML summaries to first sentence
     for r in data.get("results", []):
@@ -135,8 +143,23 @@ async def suggest_by_ingredients(ingredients: list[str], number: int = 6) -> lis
 
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.get(f"{BASE}/recipes/findByIngredients", params=params)
-        resp.raise_for_status()
-        data = resp.json()
+
+    if resp.status_code == 402:
+        log.warning("Spoonacular quota exceeded (402) — returning mock suggestions")
+        return [
+            {
+                "id": r["id"],
+                "title": r["title"],
+                "image": r.get("image"),
+                "usedIngredientCount": min(len(ingredients), 3),
+                "missedIngredientCount": max(0, 4 - len(ingredients)),
+                "likes": 120,
+            }
+            for r in MOCK_RECIPES[:number]
+        ]
+
+    resp.raise_for_status()
+    data = resp.json()
 
     return [
         {
@@ -180,6 +203,27 @@ async def get_recipe_ingredients(recipe_id: int) -> dict:
             f"{BASE}/recipes/{recipe_id}/information",
             params={"apiKey": settings.spoonacular_api_key, "includeNutrition": "false"},
         )
-        resp.raise_for_status()
 
+    if resp.status_code == 402:
+        log.warning("Spoonacular quota exceeded (402) — returning mock ingredients for recipe %s", recipe_id)
+        mock_ings = MOCK_INGREDIENTS.get(recipe_id, [
+            {"id": 1, "name": "chicken breast", "original": "2 chicken breasts", "amount": 2.0, "unit": ""},
+            {"id": 2, "name": "garlic", "original": "3 cloves garlic", "amount": 3.0, "unit": "clove"},
+            {"id": 3, "name": "olive oil", "original": "2 tbsp olive oil", "amount": 2.0, "unit": "tbsp"},
+            {"id": 4, "name": "lemon juice", "original": "juice of 1 lemon", "amount": 1.0, "unit": ""},
+            {"id": 5, "name": "salt", "original": "1 tsp salt", "amount": 1.0, "unit": "tsp"},
+            {"id": 6, "name": "black pepper", "original": "1/2 tsp black pepper", "amount": 0.5, "unit": "tsp"},
+            {"id": 7, "name": "paprika", "original": "1 tsp paprika", "amount": 1.0, "unit": "tsp"},
+        ])
+        mock_recipe = next((r for r in MOCK_RECIPES if r["id"] == recipe_id), None)
+        return {
+            "id": recipe_id,
+            "title": mock_recipe["title"] if mock_recipe else f"Recipe #{recipe_id}",
+            "image": mock_recipe.get("image") if mock_recipe else None,
+            "readyInMinutes": mock_recipe.get("readyInMinutes") if mock_recipe else None,
+            "servings": mock_recipe.get("servings") if mock_recipe else None,
+            "extendedIngredients": mock_ings,
+        }
+
+    resp.raise_for_status()
     return resp.json()
