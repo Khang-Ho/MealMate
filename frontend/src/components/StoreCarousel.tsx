@@ -6,9 +6,9 @@ import { Store } from '../types/store';
 const BOTTOM_NAV_HEIGHT = Platform.OS === 'android' ? 80 : 90;
 
 const MOCK_STORES: Store[] = [
-  { id: 'target', name: 'Target Supercenter', address: '789 Market St', distance: '0.8 mi', driveTime: '6m drive', availableItems: 12, totalItems: 12, estimatedCost: 42.5, isTopPick: true },
-  { id: 'wholefoods', name: 'Whole Foods', address: '1250 Steiner St', distance: '1.4 mi', driveTime: '12m drive', availableItems: 12, totalItems: 12, estimatedCost: 68.2 },
-  { id: 'safeway', name: 'Safeway', address: '2020 Market St', distance: '0.5 mi', driveTime: '4m drive', availableItems: 10, totalItems: 12, estimatedCost: 38.9, hasMissingItems: true },
+  { id: 'target', name: 'Target Supercenter', address: '789 Market St', distance: '0.8 mi', distanceKm: 1.3, driveTime: '6m drive', availableItems: 12, totalItems: 12, estimatedCost: 42.5, isTopPick: true },
+  { id: 'wholefoods', name: 'Whole Foods', address: '1250 Steiner St', distance: '1.4 mi', distanceKm: 2.3, driveTime: '12m drive', availableItems: 12, totalItems: 12, estimatedCost: 68.2 },
+  { id: 'safeway', name: 'Safeway', address: '2020 Market St', distance: '0.5 mi', distanceKm: 0.8, driveTime: '4m drive', availableItems: 10, totalItems: 12, estimatedCost: 38.9, hasMissingItems: true },
 ];
 
 interface StoreCarouselProps {

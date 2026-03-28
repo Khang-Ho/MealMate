@@ -59,7 +59,7 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, onNavigate, onSelec
             </View>
           )}
           <Text className="text-[8px] text-outline mt-1.5" style={{ fontStyle: 'italic' }}>
-            * Ước tính, chưa có API kho
+            * Estimated, no inventory API
           </Text>
         </View>
 

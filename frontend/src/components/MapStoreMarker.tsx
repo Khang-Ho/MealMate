@@ -26,7 +26,7 @@ export const MapStoreMarker: React.FC<MapStoreMarkerProps> = ({
 }) => {
   const isAvailable = status === 'available';
   const badgeColor = isAvailable ? Colors.primary : '#ba1a1a';
-  const badgeText = isAvailable ? 'Food Khả Thi' : 'Missing Items';
+  const badgeText = isAvailable ? 'Food Available' : 'Missing Items';
   const iconBg = isAvailable ? PRIMARY_FIXED : '#ffdad6';
   const iconColor = isAvailable ? Colors.primary : '#ba1a1a';
   const borderColor = isAvailable ? PRIMARY_FIXED : '#ffdad6';
