@@ -58,6 +58,9 @@ export const StoreCard: React.FC<StoreCardProps> = ({ store, onNavigate, onSelec
               <View className="h-full bg-primary rounded-full" style={{ width: `${pct * 100}%` }} />
             </View>
           )}
+          <Text className="text-[8px] text-outline mt-1.5" style={{ fontStyle: 'italic' }}>
+            * Ước tính, chưa có API kho
+          </Text>
         </View>
 
         <View className="flex-1 rounded-xl p-3 bg-[rgba(0,88,188,0.05)] border border-[rgba(0,88,188,0.1)]">
