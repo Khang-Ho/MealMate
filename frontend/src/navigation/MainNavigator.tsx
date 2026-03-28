@@ -22,7 +22,7 @@ export const MainNavigator: React.FC = () => (
     <Stack.Screen
       name="MarketMap"
       component={MarketMapScreen}
-      options={{ animation: 'slide_from_bottom' }}
+      options={{ animation: 'slide_from_right' }}
     />
     <Stack.Screen name="Settings" component={SettingsScreen} />
   </Stack.Navigator>
