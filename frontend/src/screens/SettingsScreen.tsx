@@ -5,10 +5,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Platform,
-  StatusBar as RNStatusBar,
   Linking,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -18,6 +17,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import type { RootStackParamList } from '../navigation/types';
 import { BottomNavBar } from '../components/BottomNavBar';
+import { BadgesSection } from '../components/BadgesSection';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -45,14 +45,16 @@ export const SettingsScreen: React.FC = () => {
     if (tabId === 'settings') navigation.navigate('Settings');
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View
-      className="flex-1 bg-surface"
-      style={{ paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0 }}
-    >
+    <View className="flex-1 bg-surface">
       <StatusBar style="dark" />
 
-      <View className="flex-row items-center px-4 h-14 border-b border-outline-variant/40 bg-surface">
+      <View
+        className="flex-row items-center px-4 border-b border-outline-variant/40 bg-surface"
+        style={{ paddingTop: insets.top + 4, paddingBottom: 12 }}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="w-10 h-10 items-center justify-center rounded-full active:bg-surface-container-high"
@@ -100,6 +102,9 @@ export const SettingsScreen: React.FC = () => {
             <Text className="text-[11px] text-on-surface-variant mt-0.5">Favourites</Text>
           </View>
         </View>
+
+        {/* ── Achievements / Badges ── */}
+        <BadgesSection />
 
         {/* Favourites list */}
         {favourites.length > 0 && (
