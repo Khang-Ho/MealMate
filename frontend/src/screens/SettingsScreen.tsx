@@ -17,6 +17,7 @@ import { useMealHistory } from '../context/MealHistoryContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import type { RootStackParamList } from '../navigation/types';
+import { BottomNavBar } from '../components/BottomNavBar';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
 
@@ -35,6 +36,13 @@ export const SettingsScreen: React.FC = () => {
 
   const handleOpenPrivacy = () => {
     Linking.openURL('https://clerk.com/legal/privacy').catch(() => undefined);
+  };
+
+  const handleTabPress = (tabId: string) => {
+    if (tabId === 'cook') navigation.navigate('Home');
+    if (tabId === 'inventory') navigation.navigate('Inventory');
+    if (tabId === 'stores') navigation.navigate('MarketMap', undefined);
+    if (tabId === 'settings') navigation.navigate('Settings');
   };
 
   return (
@@ -160,6 +168,8 @@ export const SettingsScreen: React.FC = () => {
           MealMate · Plan smarter shops with pantry-aware routing
         </Text>
       </ScrollView>
+
+      <BottomNavBar initialActive="settings" onTabPress={handleTabPress} />
     </View>
   );
 };
