@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.api.routes import stores as stores_router
 from app.api.routes import recipes as recipes_router
 from app.api.routes import saved_recipes as saved_recipes_router
+from app.api.routes import cooked_meals as cooked_meals_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ app.add_middleware(
 app.include_router(stores_router.router, prefix="/api")
 app.include_router(recipes_router.router, prefix="/api")
 app.include_router(saved_recipes_router.router, prefix="/api")
+app.include_router(cooked_meals_router.router, prefix="/api")
 
 
 @app.exception_handler(Exception)
