@@ -7,9 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
-  Platform,
-  StatusBar as RNStatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,6 +18,7 @@ import { RootStackParamList } from '../navigation/types';
 import { useRecipeIngredients, RecipeIngredient } from '../hooks/useRecipeIngredients';
 import { BottomNavBar } from '../components/BottomNavBar';
 import { useMealHistory } from '../context/MealHistoryContext';
+import { StreakCelebrationModal } from '../components/StreakCelebrationModal';
 
 type ChecklistNavProp = NativeStackNavigationProp<RootStackParamList, 'IngredientChecklist'>;
 type ChecklistRouteProp = RouteProp<RootStackParamList, 'IngredientChecklist'>;
@@ -100,6 +100,7 @@ export const IngredientChecklistScreen: React.FC = () => {
 
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [cooked, setCooked] = useState(false);
+  const [streakData, setStreakData] = useState({ visible: false, streak: 0 });
 
   // Record as recently viewed as soon as we land here
   useEffect(() => {
@@ -110,9 +111,12 @@ export const IngredientChecklistScreen: React.FC = () => {
 
   const favourite = isFavourite(recipeId);
 
-  const handleMarkCooked = () => {
-    markAsCooked({ id: recipeId, title: recipeTitle, image: recipeImage ?? null });
+  const handleMarkCooked = async () => {
     setCooked(true);
+    const result = await markAsCooked({ id: recipeId, title: recipeTitle, image: recipeImage ?? null });
+    if (result.streakIncreased) {
+      setStreakData({ visible: true, streak: result.newStreak });
+    }
   };
 
   const handleToggleFavourite = () => {
@@ -155,15 +159,17 @@ export const IngredientChecklistScreen: React.FC = () => {
   const cookTime = detail?.ready_in_minutes ? `${detail.ready_in_minutes} min` : null;
   const servings = detail?.servings ? `Serves ${detail.servings}` : null;
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View
-      className="flex-1 bg-surface"
-      style={{ paddingTop: Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0 }}
-    >
+    <View className="flex-1 bg-surface">
       <StatusBar style="light" />
 
       {/* Floating header */}
-      <View className="absolute top-0 left-0 right-0 z-10 flex-row items-center justify-between px-5 pt-12 pb-3">
+      <View
+        className="absolute left-0 right-0 z-10 flex-row items-center justify-between px-5 pb-3"
+        style={{ top: 0, paddingTop: insets.top + 8 }}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           className="w-10 h-10 rounded-full bg-black/30 items-center justify-center"
@@ -366,6 +372,12 @@ export const IngredientChecklistScreen: React.FC = () => {
       </ScrollView>
 
       <BottomNavBar initialActive="inventory" onTabPress={handleTabPress} />
+
+      <StreakCelebrationModal
+        visible={streakData.visible}
+        streak={streakData.streak}
+        onClose={() => setStreakData((prev) => ({ ...prev, visible: false }))}
+      />
     </View>
   );
 };
