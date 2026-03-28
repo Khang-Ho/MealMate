@@ -32,7 +32,7 @@ Một ứng dụng di động hỗ trợ người dùng tối ưu hóa việc ch
 | Frontend     | React Native          | Phát triển nhanh, mượt trên cả iOS/Android.                              |
 | Map Engine   | Mapbox SDK            | Hiển thị bản đồ tùy chỉnh, vẽ marker và label khoảng cách/thời gian.    |
 | Backend      | FastAPI (Python)      | Xử lý logic AI (LangChain), kết nối API và tính toán khoảng cách.       |
-| Database     | PostgreSQL + PostGIS  | Lưu trữ dữ liệu địa lý siêu thị và thông tin người dùng.                |
+| Database     | Supabase              | Lưu trữ dữ liệu địa lý siêu thị và thông tin người dùng.                |
 | Cache Layer  | Redis                 | Lưu tạm kết quả tìm kiếm để tránh gọi Google API lặp lại (tiết kiệm chi phí). |
 
 ---
