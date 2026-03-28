@@ -1,0 +1,52 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './App.{js,jsx,ts,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
+  presets: [require('nativewind/preset')],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0d631b',
+        'on-primary': '#ffffff',
+        'primary-container': '#2e7d32',
+        'primary-fixed': '#a3f69c',
+        'primary-fixed-dim': '#88d982',
+        'on-primary-fixed': '#002204',
+        'on-primary-container': '#cbffc2',
+        secondary: '#0058bc',
+        'on-secondary': '#ffffff',
+        'secondary-container': '#0070eb',
+        'on-secondary-container': '#fefcff',
+        'secondary-fixed': '#d8e2ff',
+        'secondary-fixed-dim': '#adc6ff',
+        'on-secondary-fixed': '#001a41',
+        surface: '#f7fbf0',
+        'on-surface': '#181d17',
+        'surface-container': '#ebefe5',
+        'surface-container-low': '#f1f5eb',
+        'surface-container-high': '#e5eadf',
+        'surface-container-highest': '#e0e4da',
+        'surface-container-lowest': '#ffffff',
+        'on-surface-variant': '#40493d',
+        outline: '#707a6c',
+        'outline-variant': '#bfcaba',
+        background: '#f7fbf0',
+        'on-background': '#181d17',
+        error: '#ba1a1a',
+        'error-container': '#ffdad6',
+        'on-error-container': '#93000a',
+        'map-dark': '#0f172a',
+      },
+      fontFamily: {
+        headline: ['Plus Jakarta Sans'],
+        body: ['Inter'],
+      },
+      borderRadius: {
+        '4xl': '2rem',
+      },
+    },
+  },
+  plugins: [],
+};
