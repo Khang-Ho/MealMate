@@ -1,5 +1,6 @@
 """Recipe search and ingredient endpoints."""
 from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
 
 from app.schemas.recipe import (
     RecipeIngredient,
@@ -10,6 +11,20 @@ from app.schemas.recipe import (
 from app.services import recipe_service
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
+
+
+class SuggestedRecipe(BaseModel):
+    id: int
+    title: str
+    image: str | None = None
+    usedIngredientCount: int = 0
+    missedIngredientCount: int = 0
+    likes: int = 0
+
+
+class SuggestResponse(BaseModel):
+    results: list[SuggestedRecipe]
+    total: int
 
 
 @router.get("/search", response_model=RecipeSearchResponse)
@@ -42,6 +57,24 @@ async def search_recipes(
         total_results=data.get("totalResults", len(results)),
         query=q,
     )
+
+
+@router.get("/suggest", response_model=SuggestResponse)
+async def suggest_recipes(
+    ingredients: str = Query(..., description="Comma-separated ingredient names the user already has"),
+    number: int = Query(6, ge=1, le=20),
+):
+    """Suggest recipes the user can cook with the ingredients they already have."""
+    ing_list = [i.strip() for i in ingredients.split(",") if i.strip()]
+    if not ing_list:
+        return SuggestResponse(results=[], total=0)
+    try:
+        raw = await recipe_service.suggest_by_ingredients(ing_list, number)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Spoonacular error: {exc}") from exc
+
+    results = [SuggestedRecipe(**r) for r in raw]
+    return SuggestResponse(results=results, total=len(results))
 
 
 @router.get("/{recipe_id}/ingredients", response_model=RecipeIngredientsResponse)

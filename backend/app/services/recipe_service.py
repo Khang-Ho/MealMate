@@ -106,6 +106,51 @@ async def search_recipes(
     return data
 
 
+async def suggest_by_ingredients(ingredients: list[str], number: int = 6) -> list[dict]:
+    """Return recipes that can be made with the given ingredients (Spoonacular findByIngredients)."""
+    if not ingredients:
+        return []
+
+    if not settings.spoonacular_api_key:
+        log.warning("No Spoonacular key — returning mock suggestions")
+        return [
+            {
+                "id": r["id"],
+                "title": r["title"],
+                "image": r.get("image"),
+                "usedIngredientCount": min(len(ingredients), 3),
+                "missedIngredientCount": max(0, 4 - len(ingredients)),
+                "likes": 120,
+            }
+            for r in MOCK_RECIPES[:number]
+        ]
+
+    params: dict[str, str | int] = {
+        "apiKey": settings.spoonacular_api_key,
+        "ingredients": ",".join(ingredients),
+        "number": number,
+        "ranking": 1,          # maximize used ingredients
+        "ignorePantry": "true",
+    }
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        resp = await client.get(f"{BASE}/recipes/findByIngredients", params=params)
+        resp.raise_for_status()
+        data = resp.json()
+
+    return [
+        {
+            "id": r["id"],
+            "title": r["title"],
+            "image": r.get("image"),
+            "usedIngredientCount": r.get("usedIngredientCount", 0),
+            "missedIngredientCount": r.get("missedIngredientCount", 0),
+            "likes": r.get("likes", 0),
+        }
+        for r in data
+    ]
+
+
 async def get_recipe_ingredients(recipe_id: int) -> dict:
     """Return recipe info + extendedIngredients from Spoonacular."""
     if not settings.spoonacular_api_key:
