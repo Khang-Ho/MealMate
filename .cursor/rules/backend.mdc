@@ -1,0 +1,79 @@
+---
+description: FastAPI backend conventions for MealMate
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# Backend Conventions (FastAPI + Python)
+
+## Route Handlers
+
+- All route handlers must be **async**
+- Use `APIRouter` per resource, register in `main.py`
+- Return Pydantic response schemas — never raw dicts or DB models
+
+```python
+# ✅ GOOD
+@router.get("/recipes/{recipe_id}/ingredients", response_model=list[IngredientResponse])
+async def get_ingredients(recipe_id: int, db: AsyncSession = Depends(get_db)):
+    return await ingredient_service.get_by_recipe(db, recipe_id)
+
+# ❌ BAD — sync handler, returns raw dict
+@router.get("/ingredients")
+def get_ingredients():
+    return {"data": []}
+```
+
+## Schemas vs Models
+
+- `app/models/` — SQLAlchemy ORM models (DB table definitions)
+- `app/schemas/` — Pydantic models (request body & response shapes)
+- Never expose a DB model directly in an endpoint response
+
+```python
+# app/schemas/ingredient.py
+class IngredientResponse(BaseModel):
+    id: int
+    name: str
+    in_stock: bool
+
+    model_config = ConfigDict(from_attributes=True)
+```
+
+## Services Layer
+
+- All business logic and external API calls go in `app/services/`
+- Route handlers only call services — no business logic in routes
+
+```python
+# app/services/kroger_service.py
+async def check_inventory(store_id: str, item: str) -> bool:
+    # Kroger API call here
+    ...
+```
+
+## Dependency Injection
+
+- DB sessions via `Depends(get_db)` — never instantiate sessions manually
+- Auth/config via `Depends()` pattern
+
+```python
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
+```
+
+## Settings
+
+- All config in `app/core/config.py` using `pydantic-settings`
+- Read from `.env` — never hardcode secrets
+
+```python
+# app/core/config.py
+class Settings(BaseSettings):
+    database_url: str
+    gemini_api_key: str
+    kroger_client_id: str
+
+settings = Settings()
+```

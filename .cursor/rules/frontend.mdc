@@ -1,0 +1,72 @@
+---
+description: React Native frontend conventions for MealMate
+globs: frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend Conventions (React Native + TypeScript)
+
+## Component Rules
+
+- Use **functional components only** — no class components
+- All components must be typed with TypeScript (`React.FC` or explicit props interface)
+- File name matches component name: `IngredientCard.tsx` exports `IngredientCard`
+
+```tsx
+// ✅ GOOD
+interface IngredientCardProps {
+  name: string;
+  quantity: number;
+  inStock: boolean;
+}
+
+export const IngredientCard: React.FC<IngredientCardProps> = ({ name, quantity, inStock }) => {
+  return <View>...</View>;
+};
+
+// ❌ BAD — anonymous default export, no types
+export default ({ name }) => <View />;
+```
+
+## Naming Conventions
+
+| Type            | Convention   | Example              |
+| --------------- | ------------ | -------------------- |
+| Component file  | PascalCase   | `IngredientCard.tsx` |
+| Screen file     | PascalCase   | `RecipeScreen.tsx`   |
+| Hook file       | camelCase    | `useIngredients.ts`  |
+| Utility file    | camelCase    | `formatDistance.ts`  |
+
+## Hooks
+
+- Extract reusable state logic into `src/hooks/`
+- Hook names always start with `use`
+
+```ts
+// src/hooks/useIngredients.ts
+export function useIngredients(recipeId: string) {
+  // fetch, filter, return state
+}
+```
+
+## API Calls
+
+- **Never call APIs directly from a component or hook**
+- All HTTP requests go through `src/services/`
+
+```ts
+// ✅ GOOD — src/services/recipeService.ts
+export async function fetchIngredients(recipeId: string) {
+  const { data } = await apiClient.get(`/recipes/${recipeId}/ingredients`);
+  return data;
+}
+
+// ❌ BAD — axios call inside a component
+const res = await axios.get('/recipes/...');
+```
+
+## State Management
+
+- Use **Zustand** for global state (`src/store/`)
+- Use `@tanstack/react-query` for server state (fetching, caching)
+- Local component state stays in `useState`
