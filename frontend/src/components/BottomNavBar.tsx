@@ -14,6 +14,7 @@ const DEFAULT_TABS: NavTab[] = [
   { id: 'inventory', label: 'Inventory', icon: 'kitchen' },
   { id: 'stores', label: 'Stores', icon: 'store' },
   { id: 'route', label: 'Route', icon: 'near-me' },
+  { id: 'settings', label: 'Settings', icon: 'settings' },
 ];
 
 interface BottomNavBarProps {
