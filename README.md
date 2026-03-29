@@ -17,6 +17,17 @@ MealMate helps you plan meals, build shopping lists from real recipes, find near
 
 ---
 
+## 🤖 The Role of AI
+
+MealMate uses **Gemini 1.5 Flash** and **LangChain** as a context-aware culinary and logistics agent, acting behind the scenes to power smart decisions:
+
+- **Smart Grocery Routing:** Analyzes your missing ingredients and crosses them with local store data to determine the most optimal multi-stop route, saving you time and gas.
+- **Ingredient Substitution:** Acts as a culinary assistant. If an item is out of stock everywhere nearby, the LLM suggests viable, flavor-matching substitutes.
+- **Zero-Waste Pantry Analysis:** Analyzes your pantry and completed meals history to recommend high-quality recipes that use up expiring ingredients.
+- **Natural Language Search:** Allows contextual recipe searching (e.g., *"A high-protein meal under 20 mins using chicken"*) instead of strict keyword filters.
+
+---
+
 ## 📱 Key Features
 
 - 🔍 **Recipe Search** — Search dishes by name or cuisine, browse Spoonacular results
