@@ -19,6 +19,7 @@ import {
   type PanResponderGestureState,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import Constants from 'expo-constants';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -940,8 +941,10 @@ export const MarketMapScreen: React.FC = () => {
   // Full-map view center/zoom — changes when user taps a pin to zoom in
   const [fullCenter, setFullCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [fullZoom, setFullZoom] = useState(MAP_ZOOM);
+  const isExpoGo = Constants.appOwnership === 'expo';
 
   const MapboxGL = useMemo(() => {
+    if (isExpoGo) return null;
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const mod = require('@rnmapbox/maps').default;
@@ -950,8 +953,8 @@ export const MarketMapScreen: React.FC = () => {
     } catch {
       return null;
     }
-  }, []);
-  const useNativeMap = !!MapboxGL && Platform.OS !== 'web';
+  }, [isExpoGo]);
+  const useNativeMap = !!MapboxGL && Platform.OS !== 'web' && !isExpoGo;
   const cameraRef = useRef<any>(null);
 
   const topPad = Platform.OS === 'android' ? (RNStatusBar.currentHeight ?? 0) : 0;

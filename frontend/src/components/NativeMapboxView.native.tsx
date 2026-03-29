@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
+import Constants from 'expo-constants';
 import type { NativeMapboxViewProps } from './NativeMapboxView.types';
 import type { Store } from '../types/store';
 
@@ -20,7 +21,9 @@ export const NativeMapboxView: React.FC<NativeMapboxViewProps> = ({
   onCameraChanged,
   onUnavailable,
 }) => {
+  const isExpoGo = Constants.appOwnership === 'expo';
   const MapboxGL = useMemo(() => {
+    if (isExpoGo) return null;
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const mod = require('@rnmapbox/maps').default;
@@ -29,7 +32,7 @@ export const NativeMapboxView: React.FC<NativeMapboxViewProps> = ({
     } catch {
       return null;
     }
-  }, []);
+  }, [isExpoGo]);
 
   useEffect(() => {
     if (!MapboxGL) onUnavailable?.();
