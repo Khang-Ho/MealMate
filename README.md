@@ -41,6 +41,26 @@ MealMate uses **Gemini 1.5 Flash** and **LangChain** as a context-aware culinary
 
 ---
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="images/login.jpg" width="30%" alt="Login Screen">
+  <img src="images/interactive_map.jpg" width="30%" alt="Interactive Map">
+  <img src="images/store_highlight.jpg" width="30%" alt="Store Locator">
+</p>
+<p align="center">
+  <img src="images/inventory.jpg" width="30%" alt="Pantry & Inventory">
+  <img src="images/cook.jpg" width="30%" alt="Cooking Checklist">
+  <img src="images/map_zoom.jpg" width="30%" alt="Map Gestures">
+</p>
+<p align="center">
+  <img src="images/profile.jpg" width="30%" alt="Profile Tracking">
+  <img src="images/badge.jpg" width="30%" alt="Streak & Badges">
+  <img src="images/favorite.jpg" width="30%" alt="Saved Favorites">
+</p>
+
+---
+
 ## ⚙️ Prerequisites
 
 | Tool | Required Version | Notes |
