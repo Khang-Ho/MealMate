@@ -314,8 +314,3 @@ npx expo start --port 8083
 npm install --legacy-peer-deps
 ```
 
-### Spoonacular `402 Payment Required`
-Free tier limit is **150 requests/day**. The backend automatically falls back to mock recipe data when quota is exceeded. Get a new free key at [spoonacular.com/food-api](https://spoonacular.com/food-api) (one per account).
-
-### `AbortSignal.timeout is not a function`
-Hermes (React Native JS engine) does not support `AbortSignal.timeout()`. Use `AbortController` + `setTimeout` instead — already fixed in this codebase.
