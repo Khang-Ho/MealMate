@@ -1,5 +1,7 @@
 # MealMate 🍽️
 
+**[📹 Watch Devpost Demo on YouTube](https://youtube.com/shorts/pRh1NcgXRns?si=_iJ_qxpMywVElWaW)**
+
 **AI-powered meal planning & smart grocery shopping assistant.**
 
 MealMate helps you plan meals, build shopping lists from real recipes, find nearby grocery stores on an interactive map, and track what you've cooked — all in one mobile app.
