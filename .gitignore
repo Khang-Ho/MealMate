@@ -15,3 +15,8 @@ backend/.env
 
 # Tooling / IDE caches
 .expo/
+.cursor/
+.cursorrules
+plan.md
+task.md
+walkthrough.md

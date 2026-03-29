@@ -1,0 +1,358 @@
+INFO:     Will watch for changes in these directories: ['D:\\MealMate\\backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [19084] using WatchFiles
+INFO:     Started server process [1244]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app\services\recipe_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1244]
+WARNING:  WatchFiles detected changes in 'app\api\routes\recipes.py'. Reloading...
+INFO:     Started server process [19280]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\server.py", line 79, in serve
+    await self._serve(sockets)
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\server.py", line 94, in _serve
+    await self.startup(sockets=sockets)
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\server.py", line 105, in startup
+    await self.lifespan.startup()
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\lifespan\on.py", line 56, in startup
+    await self.startup_event.wait()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\locks.py", line 213, in wait
+    await fut
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\_compat.py", line 30, in asyncio_run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\runners.py", line 123, in run
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\MealMate\backend\.venv\Lib\site-packages\starlette\routing.py", line 645, in lifespan
+    await receive()
+  File "D:\MealMate\backend\.venv\Lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\asyncio\queues.py", line 158, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+INFO:     Started server process [16608]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'app\services\recipe_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for connections to close. (CTRL+C to force quit)
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [16608]
+WARNING:  WatchFiles detected changes in 'app\services\recipe_service.py'. Reloading...
+INFO:     Started server process [2620]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2620]
+INFO:     Started server process [17052]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386156786%2C-77.1975874962442&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386156786%2C-77.1975874962442&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/findByIngredients?apiKey=3bcc200186174918ade48c90bc4ef104&ingredients=soy+sauce%2Cfish+sauce%2Cbean+sprouts%2Ccilantro%2Cbasil%2Cjalape%C3%B1o+pepper%2Csteams+green+onion%2Csriracha%2Choisin+sauce%2Clime+wedges&number=6&ranking=1&ignorePantry=true "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386156786%2C-77.19758749624407&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386156786%2C-77.19758749624407&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154196804%2C-77.19758745951333&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154196804%2C-77.19758745951333&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/716429/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1095994/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096211/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false&cuisine=Asian "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Bun&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false&cuisine=Asian "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/648502/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pizza&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096319/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386152749734%2C-77.19758743898498&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386152749734%2C-77.19758743898498&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615180916%2C-77.19758742564196&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615180916%2C-77.19758742564196&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399493&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/findByIngredients?apiKey=3bcc200186174918ade48c90bc4ef104&ingredients=arugula%2Ctomatoes%2Colives%2Cchili+peppers&number=6&ranking=1&ignorePantry=true "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399495&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615944717%2C-77.19758753399495&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758805%2C-77.19758750762135&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615758801%2C-77.197587507621&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615619718%2C-77.19758748789057&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155136106%2C-77.19758747283795&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155136106%2C-77.19758747283795&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082242&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082243&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082243&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082243&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154289104%2C-77.19758746082243&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615784117%2C-77.19758751121206&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615611282%2C-77.19758748669354&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615611282%2C-77.19758748669354&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615689736%2C-77.19758749782295&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615611282%2C-77.19758748669354&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615611282%2C-77.19758748669354&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730117&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730116&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386155450734%2C-77.19758747730116&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154884325%2C-77.19758746926608&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386154394356%2C-77.19758746231535&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615439435%2C-77.19758746231535&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615439435%2C-77.19758746231535&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153965864%2C-77.1975874562369&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153576614%2C-77.1975874507149&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615396587%2C-77.1975874562369&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615396587%2C-77.1975874562369&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153576614%2C-77.1975874507149&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153576614%2C-77.1975874507149&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615396587%2C-77.1975874562369&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615396587%2C-77.1975874562369&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386153576614%2C-77.1975874507149&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pizza&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/716300/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/647124/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/642371/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/662264/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/637054/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096319/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/662605/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1095810/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/642371/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Spring+rool&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1095883/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386157414184%2C-77.19758750515463&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386157414184%2C-77.19758750515463&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1095883/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/642371/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/642371/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Spring&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/661431/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386167291254%2C-77.19758764527084&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386167291254%2C-77.19758764527084&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438616374999%2C-77.1975875950344&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438616374999%2C-77.1975875950344&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+WARNING:  WatchFiles detected changes in 'app\services\cooked_meals_service.py'. Reloading...
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615716371%2C-77.19758750160118&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615716371%2C-77.19758750160118&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Sushi&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false&cuisine=Italian "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/650651/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615716371%2C-77.19758750160109&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20438615716371%2C-77.19758750160109&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386158749145%2C-77.19758752409206&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.204386158749145%2C-77.19758752409206&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [17052]
+WARNING:  WatchFiles detected changes in 'app\main.py', 'app\api\routes\cooked_meals.py'. Reloading...
+INFO:     Started server process [38548]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [38548]
+INFO:     Started server process [16912]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.test&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 404 Not Found"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351495843086%2C-77.19972478777508&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351495843086%2C-77.19972478777508&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=Pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494751932%2C-77.19972477622066&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494751932%2C-77.19972477622066&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494751932%2C-77.19972477622065&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494751932%2C-77.19972477622065&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494495423%2C-77.19972477350443&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494495423%2C-77.19972477350443&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494495422%2C-77.19972477350441&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494495422%2C-77.19972477350441&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514943541116%2C-77.19972477200807&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514943541116%2C-77.19972477200807&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351493939501%2C-77.19972476761771&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494047049%2C-77.19972476875655&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351493939501%2C-77.19972476761771&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351494047049%2C-77.19972476875655&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515009508976%2C-77.19972482002115&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504468465%2C-77.1997248461409&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504480472%2C-77.1997248460577&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515066011974%2C-77.19972486197754&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351504480472%2C-77.1997248460577&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515066011974%2C-77.19972486197754&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515044804725%2C-77.1997248460577&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351506007851%2C-77.19972485742356&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351508031909%2C-77.19972487260128&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351506007851%2C-77.19972485742356&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351506007851%2C-77.19972485742356&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351508031909%2C-77.19972487260128&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351506007851%2C-77.19972485742356&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515060078516%2C-77.19972485742358&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515090586315%2C-77.1997248802252&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203515090586315%2C-77.1997248802252&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351499351491%2C-77.1997248074822&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351499351491%2C-77.1997248074822&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514980601426%2C-77.19972479780515&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514980601426%2C-77.19972479780515&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351498060142%2C-77.19972479780513&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.20351498060142%2C-77.19972479780513&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514967114764%2C-77.19972478769854&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203514967114764%2C-77.19972478769854&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/saved_recipes?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=saved_at.desc "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://zuxyejiijgggabaexzzq.supabase.co/rest/v1/cooked_meals?user_id=eq.user_3Ba3Flbha9OCCMBTGaZnZz7J3qQ&select=*&order=cooked_at.desc&limit=50 "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/complexSearch?apiKey=3bcc200186174918ade48c90bc4ef104&query=pho&number=12&addRecipeInformation=true&fillIngredients=false&instructionsRequired=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.spoonacular.com/recipes/1096250/information?apiKey=3bcc200186174918ade48c90bc4ef104&includeNutrition=false "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=grocery_or_supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.203884%2C-77.199356&radius=5000&type=supermarket&key=AIzaSyA0sX6Fq37RYiH59ECGUz3YVmp1eeotgSs "HTTP/1.1 200 OK"
+WARNING:  WatchFiles detected changes in 'app\main.py', 'app\services\recipe_service.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [16912]
