@@ -313,6 +313,10 @@ backend/supabase/migrations/001_init.sql
 
 Tables created:
 - `saved_recipes` — user wishlist / favourites
+- `pantry_items` — ingredients the user already has
+- `shopping_list` — ingredients the user needs to buy
+- `cooked_meals` — history of meals the user has cooked
+- `recipe_cache` — cache to reduce Spoonacular API calls
 
 ---
 
