@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Image } from 'react-native';
+import Constants from 'expo-constants';
 import { Store } from '../types/store';
 
 export interface StoreMapViewProps {
@@ -21,6 +22,10 @@ export const StoreMapView: React.FC<StoreMapViewProps> = ({
   centerLng = 106.7009,
   stores = [],
 }) => {
+  const isExpoGo = Constants.appOwnership === 'expo';
+  if (isExpoGo) {
+    return <StaticFallback centerLat={centerLat} centerLng={centerLng} stores={stores} />;
+  }
   try {
     // Dynamic require — won't crash Expo Go, just falls through to catch
     // eslint-disable-next-line @typescript-eslint/no-var-requires
