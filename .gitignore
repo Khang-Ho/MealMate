@@ -17,6 +17,7 @@ backend/.env
 .expo/
 .cursor/
 .cursorrules
+Plan.md
 plan.md
 task.md
 walkthrough.md
